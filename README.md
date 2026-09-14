@@ -18,6 +18,8 @@ Static Netlify storefront backed by Supabase.
 5. Enter the one-time bootstrap code supplied during deployment.
 6. After it succeeds, the bootstrap code is deleted server-side and cannot be reused.
 
+If the email account is stuck as pending, use the admin page's "Resend confirmation email" button or delete the unconfirmed user in Supabase Dashboard > Authentication > Users, then create the account again.
+
 Never put a Supabase secret/service-role key in this repository. The publishable key in the frontend is intentionally public and protected by RLS.
 
 ## Supabase Auth redirect configuration
