@@ -1,23 +1,21 @@
 # Hands On Moving Thrift Store
 
-Catalog-only thrift store website for Hands On Moving.
+Static Netlify storefront backed by Supabase.
 
-## Current state
-- Public inventory catalog
-- Search and category filters
-- Item detail modal
-- Prototype admin UI for add/edit/sold/hidden/trash/delete
-- No online checkout or transactions
-- Current prototype inventory is browser-local only
+## Production pieces
+- Public catalog at `/`
+- Admin at `/admin/`
+- Supabase Auth for email/password login
+- Supabase Postgres for product listings
+- Supabase Storage bucket `product-images`
+- Row Level Security: public read of available products, admin-only writes
 
-## Planned production stack
-- GitHub: source control
-- Netlify: hosting and auto-deploys
-- Supabase: shared inventory, image storage, admin authentication, Row Level Security
+## First admin setup
+1. Open `/admin/`.
+2. Create an account with the email/password you actually want to use.
+3. Confirm the email if Supabase asks you to.
+4. Sign in.
+5. Enter the one-time bootstrap code supplied during deployment.
+6. After it succeeds, the bootstrap code is deleted server-side and cannot be reused.
 
-## Next steps
-1. Push this project to GitHub.
-2. Connect GitHub repo to Netlify.
-3. Create Supabase project.
-4. Replace localStorage inventory with Supabase.
-5. Secure /admin with Supabase Auth and RLS.
+Never put a Supabase secret/service-role key in this repository. The publishable key in the frontend is intentionally public and protected by RLS.
