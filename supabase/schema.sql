@@ -46,6 +46,45 @@ $$;
 
 grant execute on function public.is_admin() to anon, authenticated;
 
+create or replace function public.grant_admin_by_email(p_email text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_requester uuid := auth.uid();
+  v_target uuid;
+begin
+  if v_requester is null then
+    raise exception 'Authentication required';
+  end if;
+
+  if not exists (select 1 from public.admin_users where user_id = v_requester) then
+    raise exception 'Admin access required';
+  end if;
+
+  select id into v_target
+  from auth.users
+  where lower(email) = lower(trim(p_email))
+    and email_confirmed_at is not null
+  limit 1;
+
+  if v_target is null then
+    raise exception 'No confirmed user found for that email';
+  end if;
+
+  insert into public.admin_users(user_id)
+  values (v_target)
+  on conflict (user_id) do nothing;
+
+  return true;
+end;
+$$;
+
+revoke all on function public.grant_admin_by_email(text) from public, anon;
+grant execute on function public.grant_admin_by_email(text) to authenticated;
+
 create policy "public can read available products"
 on public.products for select
 to anon, authenticated
