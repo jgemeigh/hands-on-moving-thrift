@@ -35,13 +35,24 @@ create table if not exists public.site_copy (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.product_images (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  image_path text not null,
+  sort_order integer not null default 0 check (sort_order >= 0),
+  created_at timestamptz not null default now(),
+  unique (product_id, image_path)
+);
+
 alter table public.products enable row level security;
 alter table public.admin_users enable row level security;
 alter table public.site_copy enable row level security;
+alter table public.product_images enable row level security;
 
 create index if not exists products_group_tag_idx on public.products (group_tag);
 create index if not exists products_status_effective_date_idx on public.products (status_effective_date);
 create index if not exists products_status_changed_at_idx on public.products (status_changed_at);
+create index if not exists product_images_product_order_idx on public.product_images (product_id, sort_order, created_at);
 
 grant usage on schema public to anon, authenticated;
 grant select on public.products to anon, authenticated;
@@ -49,6 +60,8 @@ grant insert, update, delete on public.products to authenticated;
 grant select on public.admin_users to authenticated;
 grant select on public.site_copy to anon, authenticated;
 grant insert, update, delete on public.site_copy to authenticated;
+grant select on public.product_images to anon, authenticated;
+grant insert, update, delete on public.product_images to authenticated;
 
 create or replace function public.is_admin()
 returns boolean
@@ -227,6 +240,34 @@ on public.site_copy for delete
 to authenticated
 using (public.is_admin());
 
+create policy "public can read available product images"
+on public.product_images for select
+to anon, authenticated
+using (
+  exists (
+    select 1
+    from public.products p
+    where p.id = product_images.product_id
+      and (p.status = 'available' or public.is_admin())
+  )
+);
+
+create policy "admins can insert product images"
+on public.product_images for insert
+to authenticated
+with check (public.is_admin());
+
+create policy "admins can update product images"
+on public.product_images for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+create policy "admins can delete product images"
+on public.product_images for delete
+to authenticated
+using (public.is_admin());
+
 insert into public.site_copy(key, value) values
   ('topbar', 'Fresh finds • Local pickup only • Inventory changes often'),
   ('brand_name', 'Hands On Moving'),
@@ -258,6 +299,13 @@ insert into public.site_copy(key, value) values
   ('footer_store_note', 'Local pickup • No online checkout'),
   ('footer_admin_link', 'Admin')
 on conflict (key) do nothing;
+
+insert into public.product_images (product_id, image_path, sort_order, created_at)
+select id, image_path, 0, created_at
+from public.products
+where image_path is not null
+  and image_path <> ''
+on conflict (product_id, image_path) do nothing;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('product-images','product-images',true,10485760,array['image/jpeg','image/png','image/webp','image/gif'])
