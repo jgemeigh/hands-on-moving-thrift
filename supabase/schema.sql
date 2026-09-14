@@ -67,11 +67,10 @@ begin
   select id into v_target
   from auth.users
   where lower(email) = lower(trim(p_email))
-    and email_confirmed_at is not null
   limit 1;
 
   if v_target is null then
-    raise exception 'No confirmed user found for that email';
+    raise exception 'No user found for that email';
   end if;
 
   insert into public.admin_users(user_id)

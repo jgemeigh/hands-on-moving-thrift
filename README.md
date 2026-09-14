@@ -18,11 +18,11 @@ Static Netlify storefront backed by Supabase.
 5. Enter the one-time bootstrap code supplied during deployment.
 6. After it succeeds, the bootstrap code is deleted server-side and cannot be reused.
 
-If the email account is stuck as pending, use the admin page's "Resend confirmation email" button or delete the unconfirmed user in Supabase Dashboard > Authentication > Users, then create the account again.
+Public signup is not exposed in the admin UI. Existing admins send admin invite emails from `/admin/`.
 
 Signed-in admins can request an email change from the Account panel in `/admin/`. Supabase may require confirmation from both the current and new email addresses depending on the project's Secure email change setting.
 
-After the first bootstrap, existing admins can grant admin access to another confirmed user from `/admin/` by entering that user's email in the Admin access panel. The database function `public.grant_admin_by_email(text)` must exist in Supabase for this control to work.
+After the first bootstrap, existing admins can send a magic-link admin invite from `/admin/` by entering that user's email in the Admin access panel. The database function `public.grant_admin_by_email(text)` must exist in Supabase for this control to work.
 
 Never put a Supabase secret/service-role key in this repository. The publishable key in the frontend is intentionally public and protected by RLS.
 
