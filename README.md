@@ -19,3 +19,10 @@ Static Netlify storefront backed by Supabase.
 6. After it succeeds, the bootstrap code is deleted server-side and cannot be reused.
 
 Never put a Supabase secret/service-role key in this repository. The publishable key in the frontend is intentionally public and protected by RLS.
+
+## Supabase Auth redirect configuration
+In Supabase Dashboard > Authentication > URL Configuration:
+- Site URL: `https://hands-on-moving-thrift.netlify.app`
+- Redirect URLs: `https://hands-on-moving-thrift.netlify.app/admin/`
+
+If confirmation emails redirect to `localhost:3000`, this Supabase Auth setting still needs to be changed in the dashboard.

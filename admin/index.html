@@ -11,6 +11,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm';
 const SUPABASE_URL='https://fcgvrrrxzcqqzrqmwvmk.supabase.co';
 const SUPABASE_KEY='sb_publishable_uBIJEepDBS3RUKu8C9Quag_lWMDHrlG';
+const ADMIN_REDIRECT_URL='https://hands-on-moving-thrift.netlify.app/admin/';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=s=>document.querySelector(s);let currentStatus='available',products=[],user=null;
 function msg(text,type='notice'){const box=$('#message');box.innerHTML=`<div class="notice ${type}">${escapeHtml(text)}</div>`;setTimeout(()=>{if(box.textContent===text)box.innerHTML='';},7000)}
@@ -21,7 +22,7 @@ async function isAdmin(){const {data,error}=await supabase.from('admin_users').s
 async function refreshAuth(){const {data:{session}}=await supabase.auth.getSession();user=session?.user||null;if(!user){$('#authPanel').classList.remove('hidden');$('#claimPanel').classList.add('hidden');$('#adminPanel').classList.add('hidden');return;}$('#authPanel').classList.add('hidden');if(await isAdmin()){showAdmin();}else{$('#claimPanel').classList.remove('hidden');$('#adminPanel').classList.add('hidden');}}
 function showAdmin(){ $('#claimPanel').classList.add('hidden');$('#adminPanel').classList.remove('hidden');$('#who').textContent=`Signed in as ${user.email}`;loadProducts(); }
 $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const {error}=await supabase.auth.signInWithPassword({email:$('#loginEmail').value.trim(),password:$('#loginPassword').value});if(error)return msg(error.message,'error');msg('Signed in.','success');await refreshAuth();});
-$('#signupForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#signupEmail').value.trim(),password=$('#signupPassword').value;const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+'/admin/'}});if(error)return msg(error.message,'error');if(data.session){msg('Account created and signed in.','success');await refreshAuth();}else msg('Account created. Check your email to confirm it, then return here and sign in.','success');});
+$('#signupForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#signupEmail').value.trim(),password=$('#signupPassword').value;const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:ADMIN_REDIRECT_URL}});if(error)return msg(error.message,'error');if(data.session){msg('Account created and signed in.','success');await refreshAuth();}else msg('Account created. Check your email to confirm it, then return here and sign in.','success');});
 $('#claimForm').addEventListener('submit',async e=>{e.preventDefault();const {data,error}=await supabase.rpc('claim_first_admin',{p_code:$('#bootstrapCode').value.trim()});if(error)return msg(error.message,'error');if(data){msg('Admin access enabled.','success');await refreshAuth();}});
 $('#signOut').addEventListener('click',async()=>{await supabase.auth.signOut();location.reload();});
 async function uploadImage(file,id){if(!file)return null;const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');const path=`${id}/${crypto.randomUUID()}.${ext}`;const {error}=await supabase.storage.from('product-images').upload(path,file,{cacheControl:'3600',upsert:false});if(error)throw error;return path;}
