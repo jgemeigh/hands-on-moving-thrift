@@ -84,6 +84,84 @@ $$;
 revoke all on function public.grant_admin_by_email(text) from public, anon;
 grant execute on function public.grant_admin_by_email(text) to authenticated;
 
+create or replace function public.set_user_password_by_email(p_email text, p_password text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_requester uuid := auth.uid();
+  v_target auth.users%rowtype;
+begin
+  if v_requester is null then
+    raise exception 'Authentication required';
+  end if;
+
+  if not exists (select 1 from public.admin_users where user_id = v_requester) then
+    raise exception 'Admin access required';
+  end if;
+
+  if char_length(coalesce(p_password, '')) < 12 then
+    raise exception 'Password must be at least 12 characters';
+  end if;
+
+  select * into v_target
+  from auth.users
+  where lower(email) = lower(trim(p_email))
+  limit 1;
+
+  if v_target.id is null then
+    raise exception 'No user found for that email';
+  end if;
+
+  update auth.users
+  set
+    encrypted_password = extensions.crypt(p_password, extensions.gen_salt('bf', 10)),
+    email_confirmed_at = coalesce(email_confirmed_at, now()),
+    confirmation_token = '',
+    recovery_token = '',
+    updated_at = now()
+  where id = v_target.id;
+
+  insert into auth.identities (
+    provider_id,
+    user_id,
+    identity_data,
+    provider,
+    last_sign_in_at,
+    created_at,
+    updated_at,
+    email
+  )
+  values (
+    v_target.id::text,
+    v_target.id,
+    jsonb_build_object(
+      'sub', v_target.id::text,
+      'email', v_target.email,
+      'email_verified', true,
+      'phone_verified', false
+    ),
+    'email',
+    null,
+    now(),
+    now(),
+    v_target.email
+  )
+  on conflict (provider_id, provider) do update
+  set
+    identity_data = excluded.identity_data,
+    email = excluded.email,
+    updated_at = now();
+
+  return true;
+end;
+$$;
+
+revoke all on function public.set_user_password_by_email(text, text) from public, anon;
+grant execute on function public.set_user_password_by_email(text, text) to authenticated;
+
 create policy "public can read available products"
 on public.products for select
 to anon, authenticated
