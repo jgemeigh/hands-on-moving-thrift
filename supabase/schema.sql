@@ -11,6 +11,7 @@ create table if not exists public.products (
   description text not null default '',
   price numeric(10,2) not null default 0 check (price >= 0),
   category text not null default 'Other',
+  group_tag text not null default 'Other' check (group_tag in ('Clothing','Dishware','Toys','Decor','Holiday','Furniture','Books','Electronics','Jewelry','Kitchen','Linens','Tools','Collectibles','Home','Other')),
   condition text not null default 'Good',
   status text not null default 'available' check (status in ('available','sold','hidden','trash')),
   image_path text,
@@ -26,6 +27,8 @@ create table if not exists public.admin_users (
 
 alter table public.products enable row level security;
 alter table public.admin_users enable row level security;
+
+create index if not exists products_group_tag_idx on public.products (group_tag);
 
 grant usage on schema public to anon, authenticated;
 grant select on public.products to anon, authenticated;
