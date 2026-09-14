@@ -25,8 +25,15 @@ create table if not exists public.admin_users (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.site_copy (
+  key text primary key,
+  value text not null default '',
+  updated_at timestamptz not null default now()
+);
+
 alter table public.products enable row level security;
 alter table public.admin_users enable row level security;
+alter table public.site_copy enable row level security;
 
 create index if not exists products_group_tag_idx on public.products (group_tag);
 
@@ -34,6 +41,8 @@ grant usage on schema public to anon, authenticated;
 grant select on public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 grant select on public.admin_users to authenticated;
+grant select on public.site_copy to anon, authenticated;
+grant insert, update, delete on public.site_copy to authenticated;
 
 create or replace function public.is_admin()
 returns boolean
@@ -190,6 +199,55 @@ create policy "admins can see own admin row"
 on public.admin_users for select
 to authenticated
 using (user_id = (select auth.uid()));
+
+create policy "public can read site copy"
+on public.site_copy for select
+to anon, authenticated
+using (true);
+
+create policy "admins can insert site copy"
+on public.site_copy for insert
+to authenticated
+with check (public.is_admin());
+
+create policy "admins can update site copy"
+on public.site_copy for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+create policy "admins can delete site copy"
+on public.site_copy for delete
+to authenticated
+using (public.is_admin());
+
+insert into public.site_copy(key, value) values
+  ('topbar', 'Fresh finds • Local pickup only • Inventory changes often'),
+  ('brand_name', 'Hands On Moving'),
+  ('brand_subtitle', 'Thrift Store'),
+  ('hero_eyebrow', 'Furniture • Decor • Clothing • Oddball treasures'),
+  ('hero_title', 'Good stuff deserves another move.'),
+  ('hero_body', 'Secondhand finds from moves, cleanouts, donations, and neighborhood pickups. Browse what is currently available, then contact or visit the store.'),
+  ('hero_button', 'Browse inventory'),
+  ('hero_card_eyebrow', 'One-of-a-kind finds'),
+  ('hero_card_title', 'See it? Come grab it.'),
+  ('hero_card_body', 'No online checkout. Listings show currently available inventory.'),
+  ('inventory_title', 'Current inventory'),
+  ('inventory_subtitle', 'Live listings from the store.'),
+  ('about_pickup_title', '📍 Local pickup'),
+  ('about_pickup_body', 'Browse before making the trip.'),
+  ('about_unique_title', '🪑 One-off inventory'),
+  ('about_unique_body', 'Most pieces are unique. Once sold, they disappear from the public catalog.'),
+  ('about_reuse_title', '♻️ Reuse first'),
+  ('about_reuse_body', 'Useful items get another chance before disposal.'),
+  ('footer_description', 'Online catalog for local secondhand inventory. No online transactions.'),
+  ('footer_inventory_title', 'Inventory'),
+  ('footer_inventory_link', 'Browse available items'),
+  ('footer_store_title', 'Store'),
+  ('footer_address', '728 S. 27th St., Lincoln, NE'),
+  ('footer_store_note', 'Local pickup • No online checkout'),
+  ('footer_admin_link', 'Admin')
+on conflict (key) do nothing;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('product-images','product-images',true,10485760,array['image/jpeg','image/png','image/webp','image/gif'])
