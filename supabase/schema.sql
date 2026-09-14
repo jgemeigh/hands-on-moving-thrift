@@ -14,6 +14,10 @@ create table if not exists public.products (
   group_tag text not null default 'Other' check (group_tag in ('Clothing','Dishware','Toys','Decor','Holiday','Furniture','Books','Electronics','Jewelry','Kitchen','Linens','Tools','Collectibles','Home','Other')),
   condition text not null default 'Good',
   status text not null default 'available' check (status in ('available','sold','hidden','trash')),
+  status_effective_date date,
+  status_changed_at timestamptz,
+  status_updated_by uuid references auth.users(id) on delete set null,
+  status_updated_by_email text,
   image_path text,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
@@ -36,6 +40,8 @@ alter table public.admin_users enable row level security;
 alter table public.site_copy enable row level security;
 
 create index if not exists products_group_tag_idx on public.products (group_tag);
+create index if not exists products_status_effective_date_idx on public.products (status_effective_date);
+create index if not exists products_status_changed_at_idx on public.products (status_changed_at);
 
 grant usage on schema public to anon, authenticated;
 grant select on public.products to anon, authenticated;
@@ -225,6 +231,10 @@ insert into public.site_copy(key, value) values
   ('topbar', 'Fresh finds • Local pickup only • Inventory changes often'),
   ('brand_name', 'Hands On Moving'),
   ('brand_subtitle', 'Thrift Store'),
+  ('nav_inventory', 'Inventory'),
+  ('nav_about', 'About'),
+  ('nav_new_finds', 'New Finds'),
+  ('header_promo', 'New finds added often • 728 S. 27th St.'),
   ('hero_eyebrow', 'Furniture • Decor • Clothing • Oddball treasures'),
   ('hero_title', 'Good stuff deserves another move.'),
   ('hero_body', 'Secondhand finds from moves, cleanouts, donations, and neighborhood pickups. Browse what is currently available, then contact or visit the store.'),
