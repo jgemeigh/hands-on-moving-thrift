@@ -275,6 +275,7 @@ insert into public.site_copy(key, value) values
   ('nav_inventory', 'Inventory'),
   ('nav_about', 'About'),
   ('nav_new_finds', 'New Finds'),
+  ('store_phone', ''),
   ('header_promo', 'New finds added often • 728 S. 27th St.'),
   ('hero_eyebrow', 'Furniture • Decor • Clothing • Oddball treasures'),
   ('hero_title', 'Good stuff deserves another move.'),
