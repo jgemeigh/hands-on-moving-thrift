@@ -35,6 +35,21 @@ create table if not exists public.site_copy (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.inquiries (
+  id uuid primary key default gen_random_uuid(),
+  name text not null default '',
+  email text not null check (position('@' in email) > 1),
+  phone text not null default '',
+  request_type text not null default 'Availability',
+  item text not null default '',
+  message text not null default '',
+  status text not null default 'new' check (status in ('new','reviewed','responded')),
+  reviewed_at timestamptz,
+  responded_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.product_images (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references public.products(id) on delete cascade,
@@ -47,11 +62,13 @@ create table if not exists public.product_images (
 alter table public.products enable row level security;
 alter table public.admin_users enable row level security;
 alter table public.site_copy enable row level security;
+alter table public.inquiries enable row level security;
 alter table public.product_images enable row level security;
 
 create index if not exists products_group_tag_idx on public.products (group_tag);
 create index if not exists products_status_effective_date_idx on public.products (status_effective_date);
 create index if not exists products_status_changed_at_idx on public.products (status_changed_at);
+create index if not exists inquiries_status_created_idx on public.inquiries (status, created_at desc);
 create index if not exists product_images_product_order_idx on public.product_images (product_id, sort_order, created_at);
 
 grant usage on schema public to anon, authenticated;
@@ -60,6 +77,8 @@ grant insert, update, delete on public.products to authenticated;
 grant select on public.admin_users to authenticated;
 grant select on public.site_copy to anon, authenticated;
 grant insert, update, delete on public.site_copy to authenticated;
+grant insert on public.inquiries to anon, authenticated;
+grant select, update, delete on public.inquiries to authenticated;
 grant select on public.product_images to anon, authenticated;
 grant insert, update, delete on public.product_images to authenticated;
 
@@ -240,6 +259,27 @@ on public.site_copy for delete
 to authenticated
 using (public.is_admin());
 
+create policy "public can submit inquiries"
+on public.inquiries for insert
+to anon, authenticated
+with check (status = 'new');
+
+create policy "admins can read inquiries"
+on public.inquiries for select
+to authenticated
+using (public.is_admin());
+
+create policy "admins can update inquiries"
+on public.inquiries for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+create policy "admins can delete inquiries"
+on public.inquiries for delete
+to authenticated
+using (public.is_admin());
+
 create policy "public can read available product images"
 on public.product_images for select
 to anon, authenticated
@@ -374,6 +414,11 @@ $$;
 drop trigger if exists products_set_updated_at on public.products;
 create trigger products_set_updated_at
 before update on public.products
+for each row execute function public.set_updated_at();
+
+drop trigger if exists inquiries_set_updated_at on public.inquiries;
+create trigger inquiries_set_updated_at
+before update on public.inquiries
 for each row execute function public.set_updated_at();
 
 -- One-time first-admin bootstrap support. The live database already has this.
