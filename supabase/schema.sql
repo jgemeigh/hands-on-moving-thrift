@@ -310,7 +310,7 @@ insert into public.site_copy(key, value) values
   ('directions_url', 'https://www.google.com/maps/search/?api=1&query=728%20S.%2027th%20St.%20Lincoln%2C%20NE'),
   ('contact_title', 'Ask about an item'),
   ('contact_body', 'Send a quick note about availability or a possible hold. Include the listing name if you saw it in inventory.'),
-  ('contact_email', ''),
+  ('contact_email', 'Admin@handsonmoving.org'),
   ('inquiry_button', 'Send inquiry'),
   ('inquiry_success', 'Thanks. Your inquiry was sent.'),
   ('inquiry_error', 'Could not send the inquiry. Please call or email the store.'),
