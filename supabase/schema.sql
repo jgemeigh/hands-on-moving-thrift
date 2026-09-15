@@ -280,6 +280,7 @@ insert into public.site_copy(key, value) values
   ('hero_title', 'Good stuff deserves another move.'),
   ('hero_body', 'Secondhand finds from moves, cleanouts, donations, and neighborhood pickups. Browse what is currently available, then contact or visit the store.'),
   ('hero_button', 'Browse inventory'),
+  ('site_logo', 'assets/brand/hands-on-moving-thrift-logo.jpg'),
   ('site_hero_background', 'assets/shop/front-room.jpg'),
   ('site_ambient_left', 'assets/shop/mural-wall.jpg'),
   ('site_ambient_right', 'assets/shop/store-sign.jpg'),
