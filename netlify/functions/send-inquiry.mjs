@@ -66,7 +66,7 @@ export default async (request) => {
   if (!response.ok) {
     const details = await response.text();
     console.error("Resend failed", response.status, details);
-    return json({ error: "Email could not be sent", details }, 502);
+    return json({ error: "Email could not be sent" }, 502);
   }
 
   return json({ ok: true });
