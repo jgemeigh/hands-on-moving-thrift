@@ -339,7 +339,7 @@ insert into public.site_copy(key, value) values
   ('about_reuse_title', '♻️ Reuse first'),
   ('about_reuse_body', 'Useful items get another chance before disposal.'),
   ('store_hours_title', 'Hours'),
-  ('store_hours', 'Hours coming soon. Call or message before visiting.'),
+  ('store_hours', 'Mon-Fri 12-7, Sat 10-4, Closed Sun.'),
   ('visit_eyebrow', 'Visit the store'),
   ('visit_title', 'Stop by or ask first.'),
   ('visit_body', 'Inventory moves quickly, so use the form to ask about availability or request a short hold before making the trip.'),
