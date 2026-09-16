@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://hands-on-moving-thrift.netlify.app/sitemap.xml
