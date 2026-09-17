@@ -226,6 +226,19 @@
         flex-wrap: wrap;
         margin-bottom: 12px;
       }
+      .admin-toolbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .admin-toolbar .admin-tabs {
+        margin-bottom: 0;
+      }
+      .admin-toolbar .signOut {
+        flex: 0 0 auto;
+      }
       .tabs button,
       .admin-tabs button {
         border: 1px solid var(--line);
@@ -342,6 +355,12 @@
         display: none;
       }
       @media (max-width: 820px) {
+        .admin-toolbar {
+          flex-wrap: wrap;
+        }
+        .admin-toolbar .signOut {
+          margin-left: auto;
+        }
         .authgrid,
         .maingrid,
         .copygrid,
@@ -412,12 +431,15 @@
         </form>
       </section>
       <section id="adminPanel" class="hidden">
-        <div class="admin-tabs">
-          <button class="active" data-admin-tab="listings">LISTINGS</button
-          ><button data-admin-tab="inquiries">INQUIRIES</button
-          ><button data-admin-tab="copy">TEXT</button
-          ><button data-admin-tab="account">ACCOUNT</button
-          ><button data-admin-tab="images">IMAGES</button>
+        <div class="admin-toolbar">
+          <div class="admin-tabs">
+            <button class="active" data-admin-tab="listings">LISTINGS</button
+            ><button data-admin-tab="inquiries">INQUIRIES</button
+            ><button data-admin-tab="copy">TEXT</button
+            ><button data-admin-tab="account">ACCOUNT</button
+            ><button data-admin-tab="images">IMAGES</button>
+          </div>
+          <button type="button" class="btn secondary signOut">Log out</button>
         </div>
         <div id="accountTab" class="admin-view hidden">
           <div id="accountPanel" class="panel">
