@@ -352,6 +352,8 @@ insert into public.site_copy(key, value) values
   ('contact_body', 'Send a quick note about availability or a possible hold. Include the listing name if you saw it in inventory.'),
   ('contact_email', 'Admin@handsonmoving.org'),
   ('inquiry_button', 'Send inquiry'),
+  ('contact_method_note', 'How should we reach you? Enter an email address or phone number. You only need one.'),
+  ('inquiry_privacy', 'We use your contact information only to respond to this inquiry. We do not sell or share it for marketing.'),
   ('inquiry_success', 'Thanks. Your inquiry was sent.'),
   ('inquiry_error', 'Could not send the inquiry. Please call or email the store.'),
   ('footer_description', 'Online catalog for local secondhand inventory. No online transactions.'),
