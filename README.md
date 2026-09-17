@@ -2,6 +2,8 @@
 
 Static Netlify storefront backed by Supabase.
 
+Store operator instructions: [HOW-TO.md](HOW-TO.md)
+
 ## Production pieces
 - Public catalog at `/`
 - Admin at `/admin/`

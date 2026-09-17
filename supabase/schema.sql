@@ -5,6 +5,9 @@
 
 create extension if not exists pgcrypto;
 
+create schema if not exists private;
+revoke all on schema private from public;
+
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   title text not null check (char_length(title) between 1 and 200),
@@ -75,6 +78,7 @@ create index if not exists inquiries_status_created_idx on public.inquiries (sta
 create index if not exists product_images_product_order_idx on public.product_images (product_id, sort_order, created_at);
 
 grant usage on schema public to anon, authenticated;
+grant usage on schema private to anon, authenticated;
 grant select on public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 grant select on public.admin_users to authenticated;
@@ -85,7 +89,7 @@ grant select, update, delete on public.inquiries to authenticated;
 grant select on public.product_images to anon, authenticated;
 grant insert, update, delete on public.product_images to authenticated;
 
-create or replace function public.is_admin()
+create or replace function private.is_admin()
 returns boolean
 language sql
 stable
@@ -97,7 +101,8 @@ as $$
   );
 $$;
 
-grant execute on function public.is_admin() to anon, authenticated;
+revoke all on function private.is_admin() from public;
+grant execute on function private.is_admin() to anon, authenticated;
 
 create or replace function public.grant_admin_by_email(p_email text)
 returns boolean
@@ -218,23 +223,23 @@ grant execute on function public.set_user_password_by_email(text, text) to authe
 create policy "public can read available products"
 on public.products for select
 to anon, authenticated
-using (status = 'available' or public.is_admin());
+using (status = 'available' or private.is_admin());
 
 create policy "admins can insert products"
 on public.products for insert
 to authenticated
-with check (public.is_admin() and created_by = (select auth.uid()));
+with check (private.is_admin() and created_by = (select auth.uid()));
 
 create policy "admins can update products"
 on public.products for update
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (private.is_admin())
+with check (private.is_admin());
 
 create policy "admins can delete products"
 on public.products for delete
 to authenticated
-using (public.is_admin());
+using (private.is_admin());
 
 create policy "admins can see own admin row"
 on public.admin_users for select
@@ -249,18 +254,18 @@ using (true);
 create policy "admins can insert site copy"
 on public.site_copy for insert
 to authenticated
-with check (public.is_admin());
+with check (private.is_admin());
 
 create policy "admins can update site copy"
 on public.site_copy for update
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (private.is_admin())
+with check (private.is_admin());
 
 create policy "admins can delete site copy"
 on public.site_copy for delete
 to authenticated
-using (public.is_admin());
+using (private.is_admin());
 
 create policy "public can submit inquiries"
 on public.inquiries for insert
@@ -270,18 +275,18 @@ with check (status = 'new');
 create policy "admins can read inquiries"
 on public.inquiries for select
 to authenticated
-using (public.is_admin());
+using (private.is_admin());
 
 create policy "admins can update inquiries"
 on public.inquiries for update
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (private.is_admin())
+with check (private.is_admin());
 
 create policy "admins can delete inquiries"
 on public.inquiries for delete
 to authenticated
-using (public.is_admin());
+using (private.is_admin());
 
 create policy "public can read available product images"
 on public.product_images for select
@@ -291,25 +296,25 @@ using (
     select 1
     from public.products p
     where p.id = product_images.product_id
-      and (p.status = 'available' or public.is_admin())
+      and (p.status = 'available' or private.is_admin())
   )
 );
 
 create policy "admins can insert product images"
 on public.product_images for insert
 to authenticated
-with check (public.is_admin());
+with check (private.is_admin());
 
 create policy "admins can update product images"
 on public.product_images for update
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (private.is_admin())
+with check (private.is_admin());
 
 create policy "admins can delete product images"
 on public.product_images for delete
 to authenticated
-using (public.is_admin());
+using (private.is_admin());
 
 create or replace function public.save_product_with_images(
   p_id uuid,
@@ -330,7 +335,7 @@ as $$
 declare
   v_previous_status text;
 begin
-  if auth.uid() is null or not public.is_admin() then
+  if auth.uid() is null or not private.is_admin() then
     raise exception 'Admin access required';
   end if;
 
@@ -457,20 +462,20 @@ using (bucket_id = 'product-images');
 create policy "admins can upload product images"
 on storage.objects for insert
 to authenticated
-with check (bucket_id = 'product-images' and public.is_admin());
+with check (bucket_id = 'product-images' and private.is_admin());
 
 create policy "admins can update product images"
 on storage.objects for update
 to authenticated
-using (bucket_id = 'product-images' and public.is_admin())
-with check (bucket_id = 'product-images' and public.is_admin());
+using (bucket_id = 'product-images' and private.is_admin())
+with check (bucket_id = 'product-images' and private.is_admin());
 
 create policy "admins can delete product images"
 on storage.objects for delete
 to authenticated
-using (bucket_id = 'product-images' and public.is_admin());
+using (bucket_id = 'product-images' and private.is_admin());
 
-create or replace function public.set_updated_at()
+create or replace function private.set_updated_at()
 returns trigger
 language plpgsql
 security invoker
@@ -485,17 +490,20 @@ $$;
 drop trigger if exists products_set_updated_at on public.products;
 create trigger products_set_updated_at
 before update on public.products
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 
 drop trigger if exists inquiries_set_updated_at on public.inquiries;
 create trigger inquiries_set_updated_at
 before update on public.inquiries
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
+
+revoke all on function private.set_updated_at() from public, anon, authenticated;
+
+-- New functions are private by default until a migration explicitly grants access.
+alter default privileges for role postgres in schema public
+  revoke execute on functions from public, anon, authenticated;
 
 -- One-time first-admin bootstrap support. The live database already has this.
-create schema if not exists private;
-revoke all on schema private from public, anon, authenticated;
-
 create table if not exists private.admin_bootstrap (
   id boolean primary key default true check (id = true),
   code_hash text not null,
