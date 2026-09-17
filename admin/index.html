@@ -1115,6 +1115,9 @@
         if (error) return msg(error.message, "error");
         const values = {};
         (data || []).forEach((row) => (values[row.key] = row.value));
+        try {
+          localStorage.setItem("hands-on-site-copy", JSON.stringify(values));
+        } catch {}
         renderCopyFields(values);
         renderSiteImageFields(values);
       }
@@ -1132,6 +1135,13 @@
           .from("site_copy")
           .upsert(rows, { onConflict: "key" });
         if (error) return msg(error.message, "error");
+        try {
+          const cached = JSON.parse(
+            localStorage.getItem("hands-on-site-copy") || "{}",
+          );
+          rows.forEach((row) => (cached[row.key] = row.value));
+          localStorage.setItem("hands-on-site-copy", JSON.stringify(cached));
+        } catch {}
         msg("Website copy saved.", "success");
       });
       async function optimizePhotoFile(file, { optimize = true } = {}) {
