@@ -3,3 +3,4 @@ CODEX_HANDOFF_PRIVATE.md
 *.handoff-private
 .playwright-cli/
 .netlify/
+supabase/.temp/

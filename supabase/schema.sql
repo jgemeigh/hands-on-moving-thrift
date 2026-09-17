@@ -10,8 +10,7 @@ create table if not exists public.products (
   title text not null check (char_length(title) between 1 and 200),
   description text not null default '',
   price numeric(10,2) not null default 0 check (price >= 0),
-  category text not null default 'Other',
-  group_tag text not null default 'Other' check (group_tag in ('Clothing','Dishware','Toys','Decor','Holiday','Furniture','Books','Electronics','Jewelry','Kitchen','Linens','Tools','Collectibles','Home','Other')),
+  category text not null default 'Other' check (category in ('Clothing','Dishware','Toys','Decor','Holiday','Furniture','Books','Electronics','Jewelry','Kitchen','Linens','Tools','Collectibles','Home','Other')),
   condition text not null default 'Good',
   status text not null default 'available' check (status in ('available','sold','hidden','trash')),
   status_effective_date date,
@@ -38,7 +37,7 @@ create table if not exists public.site_copy (
 create table if not exists public.inquiries (
   id uuid primary key default gen_random_uuid(),
   name text not null default '',
-  email text not null check (position('@' in email) > 1),
+  email text not null default '',
   phone text not null default '',
   request_type text not null default 'Availability',
   item text not null default '',
@@ -47,7 +46,11 @@ create table if not exists public.inquiries (
   reviewed_at timestamptz,
   responded_at timestamptz,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint inquiries_contact_method_check check (
+    (email = '' or position('@' in email) > 1)
+    and (email <> '' or phone <> '')
+  )
 );
 
 create table if not exists public.product_images (
@@ -65,7 +68,7 @@ alter table public.site_copy enable row level security;
 alter table public.inquiries enable row level security;
 alter table public.product_images enable row level security;
 
-create index if not exists products_group_tag_idx on public.products (group_tag);
+create index if not exists products_category_idx on public.products (category);
 create index if not exists products_status_effective_date_idx on public.products (status_effective_date);
 create index if not exists products_status_changed_at_idx on public.products (status_changed_at);
 create index if not exists inquiries_status_created_idx on public.inquiries (status, created_at desc);
@@ -307,6 +310,72 @@ create policy "admins can delete product images"
 on public.product_images for delete
 to authenticated
 using (public.is_admin());
+
+create or replace function public.save_product_with_images(
+  p_id uuid,
+  p_title text,
+  p_price numeric,
+  p_category text,
+  p_condition text,
+  p_status text,
+  p_description text,
+  p_status_effective_date date,
+  p_image_paths text[]
+)
+returns uuid
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  v_previous_status text;
+begin
+  if auth.uid() is null or not public.is_admin() then
+    raise exception 'Admin access required';
+  end if;
+
+  select status into v_previous_status
+  from public.products
+  where id = p_id;
+
+  if found then
+    update public.products
+    set title = p_title,
+        price = p_price,
+        category = p_category,
+        condition = p_condition,
+        status = p_status,
+        description = coalesce(p_description, ''),
+        image_path = p_image_paths[1],
+        status_effective_date = case when p_status = 'available' then null else p_status_effective_date end,
+        status_changed_at = case when v_previous_status is distinct from p_status then now() else status_changed_at end,
+        status_updated_by = case when v_previous_status is distinct from p_status then auth.uid() else status_updated_by end,
+        status_updated_by_email = case when v_previous_status is distinct from p_status then auth.jwt() ->> 'email' else status_updated_by_email end
+    where id = p_id;
+  else
+    insert into public.products (
+      id, title, price, category, condition, status, description, image_path,
+      status_effective_date, status_changed_at, status_updated_by,
+      status_updated_by_email, created_by
+    ) values (
+      p_id, p_title, p_price, p_category, p_condition, p_status,
+      coalesce(p_description, ''), p_image_paths[1],
+      case when p_status = 'available' then null else p_status_effective_date end,
+      now(), auth.uid(), auth.jwt() ->> 'email', auth.uid()
+    );
+  end if;
+
+  delete from public.product_images where product_id = p_id;
+  insert into public.product_images (product_id, image_path, sort_order)
+  select p_id, image_path, (ord - 1)::integer
+  from unnest(coalesce(p_image_paths, array[]::text[])) with ordinality as paths(image_path, ord);
+
+  return p_id;
+end;
+$$;
+
+revoke all on function public.save_product_with_images(uuid,text,numeric,text,text,text,text,date,text[]) from public, anon;
+grant execute on function public.save_product_with_images(uuid,text,numeric,text,text,text,text,date,text[]) to authenticated;
 
 insert into public.site_copy(key, value) values
   ('topbar', 'Fresh finds • Local pickup only • Inventory changes often'),

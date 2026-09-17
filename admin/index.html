@@ -1,75 +1,1553 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1d231f"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><title>Admin • Hands On Moving Thrift</title>
-<style>
-:root{--ink:#1d231f;--cream:#f5f0e6;--paper:#fffdf7;--green:#2e5b45;--rust:#b65c3b;--red:#a53b32;--muted:#6e746f;--line:#d9d2c5}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,system-ui,sans-serif}.wrap{max-width:1120px;margin:auto;padding:20px}.top{display:flex;align-items:center;gap:12px;padding:16px 0}.top h1{font-size:24px;margin:0}.top a{margin-left:auto;color:var(--green);font-weight:800;text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:18px}.authgrid,.maingrid,.copygrid,.site-image-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.listings-grid{grid-template-columns:1fr}.listing-editor{position:fixed;inset:0;z-index:50;display:grid;place-items:start center;overflow:auto;background:rgba(29,35,31,.58);padding:24px}.listing-editor-panel{width:min(720px,100%);max-height:calc(100vh - 48px);overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.28)}label{display:block;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:12px 0 6px}input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:white;font:inherit}textarea{min-height:100px}.copygrid textarea{min-height:86px}.btn{border:0;border-radius:11px;padding:10px 13px;font-weight:900;cursor:pointer}.primary{background:var(--green);color:white}.secondary{background:#ebe4d9}.danger{background:#f7dfdc;color:var(--red)}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.notice{border-radius:12px;padding:12px 14px;margin:10px 0;background:#fff4d8;border:1px solid #e7cf93;line-height:1.45}.success{background:#e7f5ec;border-color:#b4dcc1}.error{background:#fde8e5;border-color:#edb9b1}.hidden{display:none!important}.statusbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.statusbar strong{margin-right:auto}.list{display:grid;gap:10px}.item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px}.inquiry-item{grid-template-columns:1fr auto;align-items:start}.thumb{width:64px;height:64px;border-radius:10px;background:#ddd;display:grid;place-items:center;overflow:hidden;font-size:28px}.thumb img{width:100%;height:100%;object-fit:cover}.meta{font-size:12px;color:var(--muted)}.badge{display:inline-block;border-radius:999px;background:#ebe4d9;color:var(--green);font-size:11px;font-weight:900;padding:4px 8px;text-transform:uppercase}.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.actions button{border:1px solid var(--line);background:#f3ede3;border-radius:8px;padding:7px 9px;font-weight:800;cursor:pointer}.tabs,.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tabs button,.admin-tabs button{border:1px solid var(--line);background:#f3ede3;border-radius:999px;padding:8px 11px;font-weight:800;cursor:pointer}.tabs button.active,.admin-tabs button.active{background:var(--ink);color:white}.filehint{font-size:12px;color:var(--muted);margin-top:5px}.photo-input{display:none}.image-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:10px}.existing-photo,.add-photo{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#ddd;border:1px solid var(--line)}.existing-photo img{width:100%;height:100%;object-fit:cover}.existing-photo button{position:absolute;right:5px;top:5px;border:0;border-radius:999px;background:rgba(165,59,50,.94);color:white;font-weight:900;width:24px;height:24px;line-height:24px;padding:0;cursor:pointer}.add-photo{display:grid;place-items:center;background:#f3ede3;border:2px dashed #bfb5a6;color:var(--green);font-size:34px;font-weight:900;cursor:pointer}.add-photo span{font-size:12px;color:var(--muted);display:block;margin-top:2px}.photo-badge{position:absolute;left:6px;bottom:6px;border-radius:999px;background:rgba(255,253,247,.92);color:var(--green);font-size:10px;font-weight:900;padding:3px 6px}.selected-badge{position:absolute;left:6px;bottom:6px;border-radius:999px;background:rgba(29,35,31,.78);color:white;font-size:10px;font-weight:900;padding:3px 6px}.site-image-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff}.site-image-card img{width:100%;height:170px;object-fit:cover;border-radius:12px;background:#ddd;border:1px solid var(--line)}.site-image-card h3{margin:10px 0 0}.site-image-card input[type=file]{display:none}@media(max-width:820px){.authgrid,.maingrid,.copygrid,.site-image-grid{grid-template-columns:1fr}.listing-editor{padding:12px}.listing-editor-panel{max-height:calc(100vh - 24px)}.item{grid-template-columns:56px 1fr}.inquiry-item{grid-template-columns:1fr}.actions{grid-column:1/-1;justify-content:flex-start}}
-</style></head><body><div class="wrap"><div class="top"><h1>Hands On Moving Thrift Admin</h1><a href="/">← Storefront</a></div>
-<div id="message"></div>
-<section id="authPanel" class="panel"><h2>Admin login</h2><form id="loginForm"><h3>Sign in</h3><label>Email</label><input id="loginEmail" type="email" autocomplete="username" required><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" minlength="8" required><div class="row"><button class="btn primary">Sign in</button></div></form></section>
-<section id="claimPanel" class="panel hidden"><h2>Claim first admin</h2><p>This only works once. Enter the bootstrap code provided during setup.</p><form id="claimForm"><label>One-time bootstrap code</label><input id="bootstrapCode" autocomplete="off" required><div class="row"><button class="btn primary">Make this account admin</button><button type="button" class="btn secondary signOut">Sign out</button></div></form></section>
-<section id="adminPanel" class="hidden"><div class="admin-tabs"><button class="active" data-admin-tab="listings">LISTINGS</button><button data-admin-tab="inquiries">INQUIRIES</button><button data-admin-tab="copy">TEXT</button><button data-admin-tab="account">ACCOUNT</button><button data-admin-tab="images">IMAGES</button></div><div id="accountTab" class="admin-view hidden"><div id="accountPanel" class="panel"><h2>Account</h2><div class="statusbar"><strong id="accountEmail"></strong><button type="button" class="btn secondary signOut">Sign out</button></div><div class="authgrid"><form id="emailChangeForm"><h3>Change email</h3><label>New email</label><input id="newEmail" type="email" autocomplete="email" required><div class="row"><button class="btn secondary">Send email change confirmation</button></div><p class="meta">Supabase may require confirmation from both the old and new email addresses.</p></form><form id="passwordChangeForm"><h3>Change password</h3><label>New password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="12" required><label>Confirm new password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="12" required><div class="row"><button class="btn secondary">Update password</button></div><p class="meta">This updates the password for the currently signed-in account.</p></form></div></div><div class="panel"><h2>Admin access</h2><div class="authgrid"><form id="inviteAdminForm"><h3>Invite admin</h3><label>Email</label><input id="adminEmail" type="email" autocomplete="email" required><div class="row"><button class="btn secondary">Send admin invite</button></div><p class="meta">Sends a sign-in email and grants admin access to that account.</p></form><form id="adminPasswordForm"><h3>Set temporary password</h3><label>User email</label><input id="passwordAdminEmail" type="email" autocomplete="email" required><label>Temporary password</label><input id="temporaryPassword" type="password" autocomplete="new-password" minlength="12" required><label>Confirm temporary password</label><input id="confirmTemporaryPassword" type="password" autocomplete="new-password" minlength="12" required><div class="row"><button class="btn secondary">Set password</button></div><p class="meta">For stuck accounts. Share the temporary password privately and have the user change it after signing in.</p></form></div></div></div><div id="copyTab" class="admin-view hidden"><div class="panel"><h2>Website copy</h2><form id="copyForm"><div id="copyFields" class="copygrid"></div><div class="row"><button class="btn primary">Save website copy</button></div></form></div></div><div id="imagesTab" class="admin-view hidden"><div class="panel"><h2>Website images</h2><p class="meta">These images control the storefront hero and decorative image strip. Changes save to the live site copy settings.</p><form id="siteImagesForm"><div id="siteImageFields" class="site-image-grid"></div><div class="row"><button class="btn primary">Save website images</button></div></form></div></div><div id="inquiriesTab" class="admin-view hidden"><div class="panel"><h2>Inquiries</h2><div class="row"><button id="refreshInquiries" type="button" class="btn secondary">Refresh</button></div><div id="inquiriesList" class="list"></div></div></div><div id="listingsTab" class="admin-view"><div class="maingrid listings-grid"><div id="listingEditor" class="listing-editor hidden"><div class="panel listing-editor-panel"><h2 id="formTitle">Add listing</h2><form id="productForm"><input id="editId" type="hidden"><input id="oldImagePath" type="hidden"><label>Title</label><input id="title" required maxlength="200"><div class="authgrid"><div><label>Price</label><input id="price" type="number" min="0" step="0.01" required></div><div><label>Group tag</label><select id="groupTag"><option>Clothing</option><option>Dishware</option><option>Toys</option><option>Decor</option><option>Holiday</option><option>Furniture</option><option>Books</option><option>Electronics</option><option>Jewelry</option><option>Kitchen</option><option>Linens</option><option>Tools</option><option>Collectibles</option><option>Home</option><option selected>Other</option></select></div></div><div class="authgrid"><div><label>Category</label><select id="category"><option>Furniture</option><option>Home</option><option>Clothing</option><option>Collectibles</option><option>Electronics</option><option>Other</option></select></div><div><label>Condition</label><select id="condition"><option>Excellent</option><option>Very good</option><option selected>Good</option><option>Fair</option><option>Rough</option><option>Untested</option></select></div></div><div class="authgrid"><div><label>Status</label><select id="status"><option value="available">Available</option><option value="sold">Sold</option><option value="hidden">Hidden</option><option value="trash">Trash</option></select></div><div><label>Status date</label><input id="statusDate" type="date"></div></div><label>Description</label><textarea id="description"></textarea><label>Photos</label><input id="image" class="photo-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><div id="imagePreview" class="image-preview"></div><div class="filehint">Use the plus tile to add photos. New listing photos are resized before upload to keep the site quick; GIFs stay unchanged. Existing photos stay unless you remove them.</div><div class="row"><button class="btn primary">Save listing</button><button id="cancelEdit" type="button" class="btn secondary">Cancel edit</button></div></form></div></div><div class="panel inventory-panel"><h2>Inventory</h2><div class="row"><button id="newListing" type="button" class="btn primary">New listing</button><button id="exportCsv" type="button" class="btn secondary">Export CSV</button></div><label>Group tag filter</label><select id="groupFilter"><option value="all">All group tags</option><option>Clothing</option><option>Dishware</option><option>Toys</option><option>Decor</option><option>Holiday</option><option>Furniture</option><option>Books</option><option>Electronics</option><option>Jewelry</option><option>Kitchen</option><option>Linens</option><option>Tools</option><option>Collectibles</option><option>Home</option><option>Other</option></select><div class="tabs"><button class="active" data-status="available">Available</button><button data-status="sold">Sold</button><button data-status="hidden">Hidden</button><button data-status="trash">Trash</button></div><div id="list" class="list"></div></div></div></div></section></div>
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm';
-const SUPABASE_URL='https://fcgvrrrxzcqqzrqmwvmk.supabase.co';
-const SUPABASE_KEY='sb_publishable_uBIJEepDBS3RUKu8C9Quag_lWMDHrlG';
-const ADMIN_REDIRECT_URL='https://hands-on-moving-thrift.netlify.app/admin/';
-const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=s=>document.querySelector(s);let currentStatus='available',products=[],inquiries=[],user=null,removedImagePaths=[],selectedPhotoFiles=[],selectedSiteImageFiles={};
-const copyFields=[['topbar','Top bar'],['brand_name','Brand name'],['brand_subtitle','Brand subtitle'],['nav_inventory','Nav inventory'],['nav_about','Nav about'],['nav_new_finds','Nav new finds'],['nav_contact','Nav contact'],['store_phone','Store phone'],['header_promo','Header promo'],['hero_eyebrow','Hero eyebrow'],['hero_title','Hero title'],['hero_body','Hero body'],['hero_button','Hero button'],['hero_card_eyebrow','Hero card eyebrow'],['hero_card_title','Hero card title'],['hero_card_body','Hero card body'],['inventory_title','Inventory title'],['inventory_subtitle','Inventory subtitle'],['about_pickup_title','About card 1 title'],['about_pickup_body','About card 1 body'],['about_unique_title','About card 2 title'],['about_unique_body','About card 2 body'],['about_reuse_title','About card 3 title'],['about_reuse_body','About card 3 body'],['store_hours_title','Hours card title'],['store_hours','Store hours'],['visit_eyebrow','Visit eyebrow'],['visit_title','Visit title'],['visit_body','Visit body'],['visit_address_label','Visit address label'],['visit_hours_label','Visit hours label'],['visit_contact_label','Visit contact label'],['directions_label','Directions link label'],['directions_url','Directions URL'],['contact_title','Contact form title'],['contact_body','Contact form body'],['contact_email','Inquiry recipient email'],['contact_method_note','Contact method instructions'],['inquiry_privacy','Inquiry privacy note'],['inquiry_button','Inquiry button'],['inquiry_success','Inquiry success message'],['inquiry_error','Inquiry error message'],['footer_description','Footer description'],['footer_inventory_title','Footer inventory title'],['footer_inventory_link','Footer inventory link'],['footer_contact_link','Footer contact link'],['footer_store_title','Footer store title'],['footer_address','Footer address'],['footer_store_note','Footer store note'],['footer_admin_link','Footer admin link']];
-const siteImageFields=[['site_logo','Header logo','assets/brand/hands-on-moving-thrift-logo.jpg'],['site_hero_background','Hero background','assets/shop/front-room.jpg'],['site_ambient_left','Image strip left','assets/shop/mural-wall.jpg'],['site_ambient_right','Image strip right','assets/shop/store-sign.jpg'],['site_hero_card','Hero card image','assets/shop/store-sign.jpg']];
-function msg(text,type='notice'){const box=$('#message');box.innerHTML=`<div class="notice ${type}">${escapeHtml(text)}</div>`;setTimeout(()=>{if(box.textContent===text)box.innerHTML='';},7000)}
-function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function money(v){return '$'+Number(v||0).toFixed(2)}
-function publicImage(path){return path?supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl:''}
-function siteImageUrl(value){if(!value)return '';if(/^https?:\/\//i.test(value)||value.startsWith('/'))return value;if(value.startsWith('assets/'))return `/${value}`;return publicImage(value);}
-function today(){return new Date().toISOString().slice(0,10)}
-function dateOnly(v){return v?String(v).slice(0,10):''}
-function dateTime(v){return v?new Date(v).toLocaleDateString():''}
-function csvCell(v){const s=String(v??'');return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s}
-function inquiryStatusLabel(s){return s==='responded'?'Responded':s==='reviewed'?'Reviewed':'New'}
-async function loadInquiries(){const {data,error}=await supabase.from('inquiries').select('*').order('created_at',{ascending:false});if(error)return msg(error.message,'error');inquiries=data||[];renderInquiries();}
-function renderInquiries(){const box=$('#inquiriesList');if(!box)return;box.innerHTML=inquiries.length?inquiries.map(i=>{const email=escapeHtml(i.email||''),phone=escapeHtml(i.phone||''),reviewed=i.reviewed_at?`Reviewed ${dateTime(i.reviewed_at)}`:'',responded=i.responded_at?`Responded ${dateTime(i.responded_at)}`:'';return `<div class="item inquiry-item"><div><div class="meta">${dateTime(i.created_at)} • <span class="badge">${escapeHtml(inquiryStatusLabel(i.status))}</span> • ${escapeHtml(i.request_type||'Availability')}</div><strong>${escapeHtml(i.name||'Website visitor')}</strong>${i.item?`<div><b>Item:</b> ${escapeHtml(i.item)}</div>`:''}<div><a href="mailto:${email}">${email}</a>${phone?` • <a href="tel:${phone}">${phone}</a>`:''}</div>${i.message?`<p>${escapeHtml(i.message)}</p>`:''}${reviewed||responded?`<div class="meta">${[reviewed,responded].filter(Boolean).join(' • ')}</div>`:''}</div><div class="actions">${i.status!=='reviewed'?`<button data-inquiry-status="reviewed" data-inquiry-id="${i.id}">Reviewed</button>`:''}${i.status!=='responded'?`<button data-inquiry-status="responded" data-inquiry-id="${i.id}">Responded</button>`:''}<button data-inquiry-delete="${i.id}" style="color:#a53b32">Delete</button></div></div>`}).join(''):'<div class="meta">No inquiries yet.</div>';}
-$('#refreshInquiries')?.addEventListener('click',loadInquiries);
-$('#inquiriesList')?.addEventListener('click',async e=>{const id=e.target.dataset.inquiryId,st=e.target.dataset.inquiryStatus;if(id&&st){const now=new Date().toISOString(),payload={status:st};if(st==='reviewed')payload.reviewed_at=now;if(st==='responded'){payload.reviewed_at=now;payload.responded_at=now;}const {error}=await supabase.from('inquiries').update(payload).eq('id',id);if(error)return msg(error.message,'error');await loadInquiries();return;}const del=e.target.dataset.inquiryDelete;if(del){if(!confirm('Delete this inquiry?'))return;const {error}=await supabase.from('inquiries').delete().eq('id',del);if(error)return msg(error.message,'error');await loadInquiries();}});
-async function isAdmin(){const {data,error}=await supabase.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();return !error&&!!data;}
-async function refreshAuth(){const {data:{session}}=await supabase.auth.getSession();user=session?.user||null;if(!user){$('#authPanel').classList.remove('hidden');$('#claimPanel').classList.add('hidden');$('#adminPanel').classList.add('hidden');return;}$('#authPanel').classList.add('hidden');$('#accountEmail').textContent=`Signed in as ${user.email}`;if(await isAdmin()){showAdmin();}else{$('#claimPanel').classList.remove('hidden');$('#adminPanel').classList.add('hidden');}}
-function showAdmin(){ $('#claimPanel').classList.add('hidden');$('#adminPanel').classList.remove('hidden');renderImagePreview(null);loadProducts();loadInquiries();loadCopy(); }
-$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const {error}=await supabase.auth.signInWithPassword({email:$('#loginEmail').value.trim(),password:$('#loginPassword').value});if(error)return msg(error.message,'error');msg('Signed in.','success');await refreshAuth();});
-$('#emailChangeForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#newEmail').value.trim();if(!email||email===user?.email)return msg('Enter a different email address.','error');const {error}=await supabase.auth.updateUser({email},{emailRedirectTo:ADMIN_REDIRECT_URL});if(error)return msg(error.message,'error');$('#newEmail').value='';msg('Email change requested. Check the confirmation email before signing out.','success');});
-$('#passwordChangeForm').addEventListener('submit',async e=>{e.preventDefault();const password=$('#newPassword').value,confirm=$('#confirmPassword').value;if(password!==confirm)return msg('Passwords do not match.','error');const {error}=await supabase.auth.updateUser({password});if(error)return msg(error.message,'error');$('#passwordChangeForm').reset();msg('Password updated. Use the new password next time you sign in.','success');});
-$('#claimForm').addEventListener('submit',async e=>{e.preventDefault();const {data,error}=await supabase.rpc('claim_first_admin',{p_code:$('#bootstrapCode').value.trim()});if(error)return msg(error.message,'error');if(data){msg('Admin access enabled.','success');await refreshAuth();}});
-$('#inviteAdminForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#adminEmail').value.trim();const invite=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:ADMIN_REDIRECT_URL,shouldCreateUser:true}});if(invite.error)return msg(invite.error.message,'error');const grant=await supabase.rpc('grant_admin_by_email',{p_email:email});if(grant.error)return msg(`Invite email sent, but admin access was not granted yet: ${grant.error.message}`,'error');$('#adminEmail').value='';msg('Admin invite sent and admin access granted.','success');});
-$('#adminPasswordForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#passwordAdminEmail').value.trim(),password=$('#temporaryPassword').value,confirm=$('#confirmTemporaryPassword').value;if(password!==confirm)return msg('Temporary passwords do not match.','error');const {error}=await supabase.rpc('set_user_password_by_email',{p_email:email,p_password:password});if(error)return msg(error.message,'error');$('#adminPasswordForm').reset();msg('Temporary password set. Ask the user to sign in and change it from Account.','success');});
-document.querySelectorAll('.signOut').forEach(b=>b.addEventListener('click',async()=>{await supabase.auth.signOut();location.reload();}));
-document.querySelectorAll('.admin-tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#accountTab').classList.toggle('hidden',b.dataset.adminTab!=='account');$('#copyTab').classList.toggle('hidden',b.dataset.adminTab!=='copy');$('#imagesTab').classList.toggle('hidden',b.dataset.adminTab!=='images');$('#inquiriesTab').classList.toggle('hidden',b.dataset.adminTab!=='inquiries');$('#listingsTab').classList.toggle('hidden',b.dataset.adminTab!=='listings');if(b.dataset.adminTab==='inquiries')loadInquiries();}));
-function renderCopyFields(values={}){$('#copyFields').innerHTML=copyFields.map(([key,label])=>`<div><label>${escapeHtml(label)}</label><textarea data-copy-key="${escapeHtml(key)}">${escapeHtml(values[key]||'')}</textarea></div>`).join('');}
-function renderSiteImageFields(values={}){$('#siteImageFields').innerHTML=siteImageFields.map(([key,label,fallback])=>{const pending=selectedSiteImageFiles[key],value=values[key]||fallback,src=pending?.url||siteImageUrl(value);return `<div class="site-image-card"><img src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async"><h3>${escapeHtml(label)}</h3><input data-site-image-file="${escapeHtml(key)}" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><input data-site-image-value="${escapeHtml(key)}" type="hidden" value="${escapeHtml(value)}"><div class="row"><button class="btn secondary" type="button" data-pick-site-image="${escapeHtml(key)}">Choose image</button><button class="btn secondary" type="button" data-reset-site-image="${escapeHtml(key)}">Use default</button></div><div class="filehint">${pending?'New image selected. Save to publish it.':'Current image shown above.'}</div></div>`;}).join('');}
-async function loadCopy(){renderCopyFields();renderSiteImageFields();const {data,error}=await supabase.from('site_copy').select('key,value').order('key');if(error)return msg(error.message,'error');const values={};(data||[]).forEach(row=>values[row.key]=row.value);renderCopyFields(values);renderSiteImageFields(values);}
-$('#copyForm').addEventListener('submit',async e=>{e.preventDefault();const rows=[...document.querySelectorAll('[data-copy-key]')].map(el=>({key:el.dataset.copyKey,value:el.value}));const {error}=await supabase.from('site_copy').upsert(rows,{onConflict:'key'});if(error)return msg(error.message,'error');msg('Website copy saved.','success');});
-async function optimizePhotoFile(file,{optimize=true}={}){if(!optimize||!file||file.type==='image/gif'||!file.type.startsWith('image/'))return file;let bitmap;try{bitmap=await createImageBitmap(file);}catch{return file;}const maxEdge=1800,largest=Math.max(bitmap.width,bitmap.height),scale=Math.min(1,maxEdge/largest),width=Math.round(bitmap.width*scale),height=Math.round(bitmap.height*scale);if(scale===1&&file.size<=900000){bitmap.close?.();return file;}const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(bitmap,0,0,width,height);bitmap.close?.();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.82));if(!blob)return file;const base=(file.name||'photo').replace(/\.[^.]+$/,'').replace(/[^a-z0-9_-]+/gi,'-')||'photo';return new File([blob],`${base}.jpg`,{type:'image/jpeg',lastModified:Date.now()});}
-async function uploadImage(file,id,options={}){if(!file)return null;const uploadFile=await optimizePhotoFile(file,options),ext=(uploadFile.type==='image/jpeg'?'jpg':(uploadFile.name.split('.').pop()||'jpg')).toLowerCase().replace(/[^a-z0-9]/g,'');const path=`${id}/${crypto.randomUUID()}.${ext}`;const {error}=await supabase.storage.from('product-images').upload(path,uploadFile,{cacheControl:'3600',upsert:false});if(error)throw error;return path;}
-$('#siteImageFields').addEventListener('click',e=>{const pick=e.target.dataset.pickSiteImage;if(pick){document.querySelector(`[data-site-image-file="${CSS.escape(pick)}"]`)?.click();return;}const reset=e.target.dataset.resetSiteImage;if(reset){const pending=selectedSiteImageFiles[reset];if(pending)URL.revokeObjectURL(pending.url);delete selectedSiteImageFiles[reset];const field=siteImageFields.find(([key])=>key===reset);document.querySelector(`[data-site-image-value="${CSS.escape(reset)}"]`).value=field?.[2]||'';renderSiteImageFields(Object.fromEntries([...document.querySelectorAll('[data-site-image-value]')].map(el=>[el.dataset.siteImageValue,el.value])));}});
-$('#siteImageFields').addEventListener('change',e=>{const key=e.target.dataset.siteImageFile,file=e.target.files?.[0];if(!key||!file)return;const pending=selectedSiteImageFiles[key];if(pending)URL.revokeObjectURL(pending.url);selectedSiteImageFiles[key]={file,url:URL.createObjectURL(file)};renderSiteImageFields(Object.fromEntries([...document.querySelectorAll('[data-site-image-value]')].map(el=>[el.dataset.siteImageValue,el.value])));});
-$('#siteImagesForm').addEventListener('submit',async e=>{e.preventDefault();const uploaded=[];try{const rows=[];for(const [key] of siteImageFields){let value=document.querySelector(`[data-site-image-value="${CSS.escape(key)}"]`)?.value||'';if(selectedSiteImageFiles[key]){value=await uploadImage(selectedSiteImageFiles[key].file,'site',{optimize:key!=='site_logo'});uploaded.push(value);}rows.push({key,value});}const {error}=await supabase.from('site_copy').upsert(rows,{onConflict:'key'});if(error)throw error;Object.values(selectedSiteImageFiles).forEach(item=>URL.revokeObjectURL(item.url));selectedSiteImageFiles={};msg('Website images saved.','success');await loadCopy();}catch(err){if(uploaded.length)await supabase.storage.from('product-images').remove(uploaded);msg(err.message||String(err),'error');}});
-function imagesFor(p){const rows=[...(p.product_images||[])].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));const paths=rows.map(row=>row.image_path).filter(Boolean);if(!paths.length&&p.image_path)paths.push(p.image_path);return [...new Set(paths)];}
-function clearSelectedPhotos(){selectedPhotoFiles.forEach(item=>URL.revokeObjectURL(item.url));selectedPhotoFiles=[];}
-function currentProduct(){return products.find(x=>x.id===$('#editId').value)||null;}
-function renderImagePreview(p=currentProduct()){const paths=imagesFor(p||{}).filter(path=>!removedImagePaths.includes(path));const existing=paths.map((path,i)=>`<div class="existing-photo"><img src="${escapeHtml(publicImage(path))}" alt="" loading="lazy" decoding="async"><button type="button" title="Remove photo" data-remove-image="${escapeHtml(path)}">x</button>${i===0?'<span class="photo-badge">Primary</span>':''}</div>`).join('');const selected=selectedPhotoFiles.map((item,i)=>`<div class="existing-photo"><img src="${escapeHtml(item.url)}" alt="" loading="lazy" decoding="async"><button type="button" title="Remove selected photo" data-remove-selected="${escapeHtml(item.id)}">x</button><span class="selected-badge">New ${i+1}</span></div>`).join('');$('#imagePreview').innerHTML=existing+selected+`<button class="add-photo" type="button" data-add-photo>+<span>Add photo</span></button>`;}
-async function loadProducts(){const {data,error}=await supabase.from('products').select('*').order('created_at',{ascending:false});if(error)return msg(error.message,'error');products=data||[];const ids=products.map(p=>p.id);if(ids.length){const {data:images,error:imageError}=await supabase.from('product_images').select('*').in('product_id',ids).order('sort_order',{ascending:true});if(imageError)return msg(imageError.message,'error');const byProduct={};(images||[]).forEach(img=>{(byProduct[img.product_id] ||= []).push(img);});products=products.map(p=>({...p,product_images:byProduct[p.id]||[]}));}renderList();}
-function renderList(){const tag=$('#groupFilter')?.value||'all';const list=products.filter(p=>p.status===currentStatus&&(tag==='all'||(p.group_tag||'Other')===tag));$('#list').innerHTML=list.length?list.map(p=>{const paths=imagesFor(p),img=paths[0]?publicImage(paths[0]):'',statusMeta=p.status==='available'?'':` • ${dateOnly(p.status_effective_date)||'No status date'} • updated ${dateTime(p.status_changed_at)||'unknown'}${p.status_updated_by_email?` by ${escapeHtml(p.status_updated_by_email)}`:''}`,photoMeta=paths.length?` • ${paths.length} photo${paths.length===1?'':'s'}`:'';return `<div class="item"><div class="thumb">${img?`<img src="${escapeHtml(img)}" alt="" loading="lazy" decoding="async">`:'📦'}</div><div><strong>${escapeHtml(p.title)}</strong><div class="meta">${money(p.price)} • ${escapeHtml(p.group_tag||'Other')} • ${escapeHtml(p.category)} • ${escapeHtml(p.condition)}${photoMeta}${statusMeta}</div></div><div class="actions"><button data-edit="${p.id}">Edit</button>${p.status!=='available'?`<button data-statuschange="available" data-id="${p.id}">Restore</button>`:`<button data-statuschange="sold" data-id="${p.id}">Sold</button><button data-statuschange="hidden" data-id="${p.id}">Hide</button>`}${p.status!=='trash'?`<button data-statuschange="trash" data-id="${p.id}">Trash</button>`:`<button data-delete="${p.id}" style="color:#a53b32">Delete forever</button>`}</div></div>`}).join(''):'<div class="meta">Nothing here.</div>';}
-document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentStatus=b.dataset.status;renderList();}));
-$('#groupFilter').addEventListener('change',renderList);
-function openListingEditor(){ $('#listingEditor').classList.remove('hidden');document.body.style.overflow='hidden';}
-function closeListingEditor(){ $('#listingEditor').classList.add('hidden');document.body.style.overflow='';}
-function discardListingForm(){resetForm();closeListingEditor();}
-$('#newListing').addEventListener('click',()=>{resetForm();openListingEditor();});
-$('#listingEditor').addEventListener('click',e=>{if(e.target.id==='listingEditor')discardListingForm();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#listingEditor').classList.contains('hidden'))discardListingForm();});
-$('#exportCsv').addEventListener('click',()=>{const headers=['id','title','price','group_tag','category','condition','status','status_effective_date','status_changed_at','status_updated_by_email','created_at','updated_at','description','image_path','image_paths'];const lines=[headers.join(',')].concat(products.map(p=>headers.map(h=>csvCell(h==='image_paths'?imagesFor(p).join('|'):p[h])).join(',')));const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`hands-on-moving-thrift-inventory-${today()}.csv`;a.click();URL.revokeObjectURL(url);});
-$('#list').addEventListener('click',async e=>{const edit=e.target.dataset.edit;if(edit){const p=products.find(x=>x.id===edit);removedImagePaths=[];clearSelectedPhotos();$('#editId').value=p.id;$('#oldImagePath').value=p.image_path||'';$('#title').value=p.title;$('#price').value=p.price;$('#groupTag').value=p.group_tag||'Other';$('#category').value=p.category;$('#condition').value=p.condition;$('#status').value=p.status;$('#statusDate').value=dateOnly(p.status_effective_date);$('#description').value=p.description||'';$('#image').value='';renderImagePreview(p);$('#formTitle').textContent='Edit listing';openListingEditor();return;}const id=e.target.dataset.id,st=e.target.dataset.statuschange;if(id&&st){const payload={status:st,status_effective_date:st==='available'?null:today(),status_changed_at:new Date().toISOString(),status_updated_by:user.id,status_updated_by_email:user.email};const {error}=await supabase.from('products').update(payload).eq('id',id);if(error)return msg(error.message,'error');await loadProducts();return;}const del=e.target.dataset.delete;if(del){const p=products.find(x=>x.id===del);if(!confirm(`Permanently delete ${p.title}?`))return;const paths=imagesFor(p);if(paths.length)await supabase.storage.from('product-images').remove(paths);const {error}=await supabase.from('products').delete().eq('id',del);if(error)return msg(error.message,'error');await loadProducts();}});
-$('#imagePreview').addEventListener('click',e=>{const add=e.target.closest('[data-add-photo]');if(add){$('#image').click();return;}const selectedId=e.target.dataset.removeSelected;if(selectedId){const item=selectedPhotoFiles.find(x=>x.id===selectedId);if(item)URL.revokeObjectURL(item.url);selectedPhotoFiles=selectedPhotoFiles.filter(x=>x.id!==selectedId);renderImagePreview();return;}const path=e.target.dataset.removeImage;if(!path)return;removedImagePaths=[...new Set([...removedImagePaths,path])];renderImagePreview();});
-$('#image').addEventListener('change',e=>{const files=[...e.target.files];files.forEach(file=>selectedPhotoFiles.push({id:crypto.randomUUID(),file,url:URL.createObjectURL(file)}));e.target.value='';renderImagePreview();});
-function resetForm(){ $('#productForm').reset();$('#editId').value='';$('#oldImagePath').value='';$('#status').value='available';$('#statusDate').value='';$('#groupTag').value='Other';removedImagePaths=[];clearSelectedPhotos();renderImagePreview(null);$('#formTitle').textContent='Add listing';}
-$('#cancelEdit').addEventListener('click',discardListingForm);
-$('#productForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('#editId').value||crypto.randomUUID(),existing=products.find(p=>p.id===id),status=$('#status').value,uploaded=[];try{for(const item of selectedPhotoFiles)uploaded.push(await uploadImage(item.file,id));const kept=imagesFor(existing||{}).filter(path=>!removedImagePaths.includes(path));const paths=[...new Set([...kept,...uploaded])];const imagePath=paths[0]||null;const statusChanged=!existing||existing.status!==status;const payload={title:$('#title').value.trim(),price:Number($('#price').value),group_tag:$('#groupTag').value,category:$('#category').value,condition:$('#condition').value,status,description:$('#description').value.trim(),image_path:imagePath,status_effective_date:status==='available'?null:($('#statusDate').value||today())};if(statusChanged){payload.status_changed_at=new Date().toISOString();payload.status_updated_by=user.id;payload.status_updated_by_email=user.email;}let error;if($('#editId').value){({error}=await supabase.from('products').update(payload).eq('id',id));}else{({error}=await supabase.from('products').insert({...payload,id,created_by:user.id}));}if(error)throw error;const imageDelete=await supabase.from('product_images').delete().eq('product_id',id);if(imageDelete.error)throw imageDelete.error;if(paths.length){const imageRows=paths.map((path,index)=>({product_id:id,image_path:path,sort_order:index}));const imageInsert=await supabase.from('product_images').insert(imageRows);if(imageInsert.error)throw imageInsert.error;}if(removedImagePaths.length)await supabase.storage.from('product-images').remove(removedImagePaths);resetForm();closeListingEditor();msg('Listing saved. Photos stored with this listing.','success');await loadProducts();}catch(err){if(uploaded.length)await supabase.storage.from('product-images').remove(uploaded);msg(err.message||String(err),'error');}});
-supabase.auth.onAuthStateChange(()=>refreshAuth());refreshAuth();
-</script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#1d231f" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Admin • Hands On Moving Thrift</title>
+    <style>
+      :root {
+        --ink: #1d231f;
+        --cream: #f5f0e6;
+        --paper: #fffdf7;
+        --green: #2e5b45;
+        --rust: #b65c3b;
+        --red: #a53b32;
+        --muted: #6e746f;
+        --line: #d9d2c5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--cream);
+        color: var(--ink);
+        font-family: Inter, system-ui, sans-serif;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: auto;
+        padding: 20px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 0;
+      }
+      .top h1 {
+        font-size: 24px;
+        margin: 0;
+      }
+      .top a {
+        margin-left: auto;
+        color: var(--green);
+        font-weight: 800;
+        text-decoration: none;
+      }
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 18px;
+      }
+      .authgrid,
+      .maingrid,
+      .copygrid,
+      .site-image-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .listings-grid {
+        grid-template-columns: 1fr;
+      }
+      .listing-editor {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: start center;
+        overflow: auto;
+        background: rgba(29, 35, 31, 0.58);
+        padding: 24px;
+      }
+      .listing-editor-panel {
+        width: min(720px, 100%);
+        max-height: calc(100vh - 48px);
+        overflow: auto;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin: 12px 0 6px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        font: inherit;
+      }
+      textarea {
+        min-height: 100px;
+      }
+      .copygrid textarea {
+        min-height: 86px;
+      }
+      .btn {
+        border: 0;
+        border-radius: 11px;
+        padding: 10px 13px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .primary {
+        background: var(--green);
+        color: white;
+      }
+      .secondary {
+        background: #ebe4d9;
+      }
+      .danger {
+        background: #f7dfdc;
+        color: var(--red);
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .notice {
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin: 10px 0;
+        background: #fff4d8;
+        border: 1px solid #e7cf93;
+        line-height: 1.45;
+      }
+      .success {
+        background: #e7f5ec;
+        border-color: #b4dcc1;
+      }
+      .error {
+        background: #fde8e5;
+        border-color: #edb9b1;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .statusbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .statusbar strong {
+        margin-right: auto;
+      }
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+      .item {
+        display: grid;
+        grid-template-columns: 64px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 10px;
+      }
+      .inquiry-item {
+        grid-template-columns: 1fr auto;
+        align-items: start;
+      }
+      .thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: 10px;
+        background: #ddd;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        font-size: 28px;
+      }
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .badge {
+        display: inline-block;
+        border-radius: 999px;
+        background: #ebe4d9;
+        color: var(--green);
+        font-size: 11px;
+        font-weight: 900;
+        padding: 4px 8px;
+        text-transform: uppercase;
+      }
+      .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .actions button {
+        border: 1px solid var(--line);
+        background: #f3ede3;
+        border-radius: 8px;
+        padding: 7px 9px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tabs,
+      .admin-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      .tabs button,
+      .admin-tabs button {
+        border: 1px solid var(--line);
+        background: #f3ede3;
+        border-radius: 999px;
+        padding: 8px 11px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .tabs button.active,
+      .admin-tabs button.active {
+        background: var(--ink);
+        color: white;
+      }
+      .filehint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .photo-input {
+        display: none;
+      }
+      .image-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .existing-photo,
+      .add-photo {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ddd;
+        border: 1px solid var(--line);
+      }
+      .existing-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .existing-photo button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(165, 59, 50, 0.94);
+        color: white;
+        font-weight: 900;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0;
+        cursor: pointer;
+      }
+      .add-photo {
+        display: grid;
+        place-items: center;
+        background: #f3ede3;
+        border: 2px dashed #bfb5a6;
+        color: var(--green);
+        font-size: 34px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .add-photo span {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        margin-top: 2px;
+      }
+      .photo-badge {
+        position: absolute;
+        left: 6px;
+        bottom: 6px;
+        border-radius: 999px;
+        background: rgba(255, 253, 247, 0.92);
+        color: var(--green);
+        font-size: 10px;
+        font-weight: 900;
+        padding: 3px 6px;
+      }
+      .selected-badge {
+        position: absolute;
+        left: 6px;
+        bottom: 6px;
+        border-radius: 999px;
+        background: rgba(29, 35, 31, 0.78);
+        color: white;
+        font-size: 10px;
+        font-weight: 900;
+        padding: 3px 6px;
+      }
+      .site-image-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 12px;
+        background: #fff;
+      }
+      .site-image-card img {
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+        border-radius: 12px;
+        background: #ddd;
+        border: 1px solid var(--line);
+      }
+      .site-image-card h3 {
+        margin: 10px 0 0;
+      }
+      .site-image-card input[type="file"] {
+        display: none;
+      }
+      @media (max-width: 820px) {
+        .authgrid,
+        .maingrid,
+        .copygrid,
+        .site-image-grid {
+          grid-template-columns: 1fr;
+        }
+        .listing-editor {
+          padding: 12px;
+        }
+        .listing-editor-panel {
+          max-height: calc(100vh - 24px);
+        }
+        .item {
+          grid-template-columns: 56px 1fr;
+        }
+        .inquiry-item {
+          grid-template-columns: 1fr;
+        }
+        .actions {
+          grid-column: 1/-1;
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <h1>Hands On Moving Thrift Admin</h1>
+        <a href="/">← Storefront</a>
+      </div>
+      <div id="message"></div>
+      <section id="authPanel" class="panel">
+        <h2>Admin login</h2>
+        <form id="loginForm">
+          <h3>Sign in</h3>
+          <label>Email</label
+          ><input
+            id="loginEmail"
+            type="email"
+            autocomplete="username"
+            required
+          /><label>Password</label
+          ><input
+            id="loginPassword"
+            type="password"
+            autocomplete="current-password"
+            minlength="8"
+            required
+          />
+          <div class="row"><button class="btn primary">Sign in</button></div>
+        </form>
+      </section>
+      <section id="claimPanel" class="panel hidden">
+        <h2>Claim first admin</h2>
+        <p>
+          This only works once. Enter the bootstrap code provided during setup.
+        </p>
+        <form id="claimForm">
+          <label>One-time bootstrap code</label
+          ><input id="bootstrapCode" autocomplete="off" required />
+          <div class="row">
+            <button class="btn primary">Make this account admin</button
+            ><button type="button" class="btn secondary signOut">
+              Sign out
+            </button>
+          </div>
+        </form>
+      </section>
+      <section id="adminPanel" class="hidden">
+        <div class="admin-tabs">
+          <button class="active" data-admin-tab="listings">LISTINGS</button
+          ><button data-admin-tab="inquiries">INQUIRIES</button
+          ><button data-admin-tab="copy">TEXT</button
+          ><button data-admin-tab="account">ACCOUNT</button
+          ><button data-admin-tab="images">IMAGES</button>
+        </div>
+        <div id="accountTab" class="admin-view hidden">
+          <div id="accountPanel" class="panel">
+            <h2>Account</h2>
+            <div class="statusbar">
+              <strong id="accountEmail"></strong
+              ><button type="button" class="btn secondary signOut">
+                Sign out
+              </button>
+            </div>
+            <div class="authgrid">
+              <form id="emailChangeForm">
+                <h3>Change email</h3>
+                <label>New email</label
+                ><input
+                  id="newEmail"
+                  type="email"
+                  autocomplete="email"
+                  required
+                />
+                <div class="row">
+                  <button class="btn secondary">
+                    Send email change confirmation
+                  </button>
+                </div>
+                <p class="meta">
+                  Supabase may require confirmation from both the old and new
+                  email addresses.
+                </p>
+              </form>
+              <form id="passwordChangeForm">
+                <h3>Change password</h3>
+                <label>New password</label
+                ><input
+                  id="newPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  required
+                /><label>Confirm new password</label
+                ><input
+                  id="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  required
+                />
+                <div class="row">
+                  <button class="btn secondary">Update password</button>
+                </div>
+                <p class="meta">
+                  This updates the password for the currently signed-in account.
+                </p>
+              </form>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>Admin access</h2>
+            <div class="authgrid">
+              <form id="inviteAdminForm">
+                <h3>Invite admin</h3>
+                <label>Email</label
+                ><input
+                  id="adminEmail"
+                  type="email"
+                  autocomplete="email"
+                  required
+                />
+                <div class="row">
+                  <button class="btn secondary">Send admin invite</button>
+                </div>
+                <p class="meta">
+                  Sends a sign-in email and grants admin access to that account.
+                </p>
+              </form>
+              <form id="adminPasswordForm">
+                <h3>Set temporary password</h3>
+                <label>User email</label
+                ><input
+                  id="passwordAdminEmail"
+                  type="email"
+                  autocomplete="email"
+                  required
+                /><label>Temporary password</label
+                ><input
+                  id="temporaryPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  required
+                /><label>Confirm temporary password</label
+                ><input
+                  id="confirmTemporaryPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  required
+                />
+                <div class="row">
+                  <button class="btn secondary">Set password</button>
+                </div>
+                <p class="meta">
+                  For stuck accounts. Share the temporary password privately and
+                  have the user change it after signing in.
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div id="copyTab" class="admin-view hidden">
+          <div class="panel">
+            <h2>Website copy</h2>
+            <form id="copyForm">
+              <div id="copyFields" class="copygrid"></div>
+              <div class="row">
+                <button class="btn primary">Save website copy</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="imagesTab" class="admin-view hidden">
+          <div class="panel">
+            <h2>Website images</h2>
+            <p class="meta">
+              These images control the storefront hero and decorative image
+              strip. Changes save to the live site copy settings.
+            </p>
+            <form id="siteImagesForm">
+              <div id="siteImageFields" class="site-image-grid"></div>
+              <div class="row">
+                <button class="btn primary">Save website images</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="inquiriesTab" class="admin-view hidden">
+          <div class="panel">
+            <h2>Inquiries</h2>
+            <div class="row">
+              <button id="refreshInquiries" type="button" class="btn secondary">
+                Refresh
+              </button>
+            </div>
+            <div id="inquiriesList" class="list"></div>
+          </div>
+        </div>
+        <div id="listingsTab" class="admin-view">
+          <div class="maingrid listings-grid">
+            <div id="listingEditor" class="listing-editor hidden">
+              <div class="panel listing-editor-panel">
+                <h2 id="formTitle">Add listing</h2>
+                <form id="productForm">
+                  <input id="editId" type="hidden" /><input
+                    id="oldImagePath"
+                    type="hidden"
+                  /><label>Title</label
+                  ><input id="title" required maxlength="200" />
+                  <div class="authgrid">
+                    <div>
+                      <label>Price</label
+                      ><input
+                        id="price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label>Category</label
+                      ><select id="category">
+                        <option>Clothing</option>
+                        <option>Dishware</option>
+                        <option>Toys</option>
+                        <option>Decor</option>
+                        <option>Holiday</option>
+                        <option>Furniture</option>
+                        <option>Books</option>
+                        <option>Electronics</option>
+                        <option>Jewelry</option>
+                        <option>Kitchen</option>
+                        <option>Linens</option>
+                        <option>Tools</option>
+                        <option>Collectibles</option>
+                        <option>Home</option>
+                        <option selected>Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="authgrid">
+                    <div>
+                      <label>Condition</label
+                      ><select id="condition">
+                        <option>Excellent</option>
+                        <option>Very good</option>
+                        <option selected>Good</option>
+                        <option>Fair</option>
+                        <option>Rough</option>
+                        <option>Untested</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="authgrid">
+                    <div>
+                      <label>Status</label
+                      ><select id="status">
+                        <option value="available">Available</option>
+                        <option value="sold">Sold</option>
+                        <option value="hidden">Hidden</option>
+                        <option value="trash">Trash</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>Status date</label
+                      ><input id="statusDate" type="date" />
+                    </div>
+                  </div>
+                  <label>Description</label
+                  ><textarea id="description"></textarea><label>Photos</label
+                  ><input
+                    id="image"
+                    class="photo-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    multiple
+                  />
+                  <div id="imagePreview" class="image-preview"></div>
+                  <div class="filehint">
+                    Use the plus tile to add photos. New listing photos are
+                    resized before upload to keep the site quick; GIFs stay
+                    unchanged. Existing photos stay unless you remove them.
+                  </div>
+                  <div class="row">
+                    <button class="btn primary">Save listing</button
+                    ><button
+                      id="cancelEdit"
+                      type="button"
+                      class="btn secondary"
+                    >
+                      Cancel edit
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="panel inventory-panel">
+              <h2>Inventory</h2>
+              <div class="row">
+                <button id="newListing" type="button" class="btn primary">
+                  New listing</button
+                ><button id="exportCsv" type="button" class="btn secondary">
+                  Export CSV
+                </button>
+              </div>
+              <label>Category filter</label
+              ><select id="categoryFilter">
+                <option value="all">All categories</option>
+                <option>Clothing</option>
+                <option>Dishware</option>
+                <option>Toys</option>
+                <option>Decor</option>
+                <option>Holiday</option>
+                <option>Furniture</option>
+                <option>Books</option>
+                <option>Electronics</option>
+                <option>Jewelry</option>
+                <option>Kitchen</option>
+                <option>Linens</option>
+                <option>Tools</option>
+                <option>Collectibles</option>
+                <option>Home</option>
+                <option>Other</option>
+              </select>
+              <div class="tabs">
+                <button class="active" data-status="available">Available</button
+                ><button data-status="sold">Sold</button
+                ><button data-status="hidden">Hidden</button
+                ><button data-status="trash">Trash</button>
+              </div>
+              <div id="list" class="list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm";
+      const SUPABASE_URL = "https://fcgvrrrxzcqqzrqmwvmk.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_uBIJEepDBS3RUKu8C9Quag_lWMDHrlG";
+      const ADMIN_REDIRECT_URL =
+        "https://hands-on-moving-thrift.netlify.app/admin/";
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const $ = (s) => document.querySelector(s);
+      let currentStatus = "available",
+        products = [],
+        inquiries = [],
+        user = null,
+        removedImagePaths = [],
+        selectedPhotoFiles = [],
+        selectedSiteImageFiles = {};
+      const copyFields = [
+        ["topbar", "Top bar"],
+        ["brand_name", "Brand name"],
+        ["brand_subtitle", "Brand subtitle"],
+        ["nav_inventory", "Nav inventory"],
+        ["nav_about", "Nav about"],
+        ["nav_new_finds", "Nav new finds"],
+        ["nav_contact", "Nav contact"],
+        ["store_phone", "Store phone"],
+        ["header_promo", "Header promo"],
+        ["hero_eyebrow", "Hero eyebrow"],
+        ["hero_title", "Hero title"],
+        ["hero_body", "Hero body"],
+        ["hero_button", "Hero button"],
+        ["hero_card_eyebrow", "Hero card eyebrow"],
+        ["hero_card_title", "Hero card title"],
+        ["hero_card_body", "Hero card body"],
+        ["inventory_title", "Inventory title"],
+        ["inventory_subtitle", "Inventory subtitle"],
+        ["about_pickup_title", "About card 1 title"],
+        ["about_pickup_body", "About card 1 body"],
+        ["about_unique_title", "About card 2 title"],
+        ["about_unique_body", "About card 2 body"],
+        ["about_reuse_title", "About card 3 title"],
+        ["about_reuse_body", "About card 3 body"],
+        ["store_hours_title", "Hours card title"],
+        ["store_hours", "Store hours"],
+        ["visit_eyebrow", "Visit eyebrow"],
+        ["visit_title", "Visit title"],
+        ["visit_body", "Visit body"],
+        ["visit_address_label", "Visit address label"],
+        ["visit_hours_label", "Visit hours label"],
+        ["visit_contact_label", "Visit contact label"],
+        ["directions_label", "Directions link label"],
+        ["directions_url", "Directions URL"],
+        ["contact_title", "Contact form title"],
+        ["contact_body", "Contact form body"],
+        ["contact_email", "Inquiry recipient email (controls form delivery)"],
+        ["contact_method_note", "Contact method instructions"],
+        ["inquiry_privacy", "Inquiry privacy note"],
+        ["inquiry_button", "Inquiry button"],
+        ["inquiry_success", "Inquiry success message"],
+        ["inquiry_error", "Inquiry error message"],
+        ["footer_description", "Footer description"],
+        ["footer_inventory_title", "Footer inventory title"],
+        ["footer_inventory_link", "Footer inventory link"],
+        ["footer_contact_link", "Footer contact link"],
+        ["footer_store_title", "Footer store title"],
+        ["footer_address", "Footer address"],
+        ["footer_store_note", "Footer store note"],
+        ["footer_admin_link", "Footer admin link"],
+      ];
+      const siteImageFields = [
+        [
+          "site_logo",
+          "Header logo",
+          "assets/brand/hands-on-moving-thrift-logo.jpg",
+        ],
+        [
+          "site_hero_background",
+          "Hero background",
+          "assets/shop/front-room.jpg",
+        ],
+        ["site_ambient_left", "Image strip left", "assets/shop/mural-wall.jpg"],
+        [
+          "site_ambient_right",
+          "Image strip right",
+          "assets/shop/store-sign.jpg",
+        ],
+        ["site_hero_card", "Hero card image", "assets/shop/store-sign.jpg"],
+      ];
+      function msg(text, type = "notice") {
+        const box = $("#message");
+        box.innerHTML = `<div class="notice ${type}">${escapeHtml(text)}</div>`;
+        setTimeout(() => {
+          if (box.textContent === text) box.innerHTML = "";
+        }, 7000);
+      }
+      function escapeHtml(s = "") {
+        return String(s).replace(
+          /[&<>'"]/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;",
+            })[c],
+        );
+      }
+      function money(v) {
+        return "$" + Number(v || 0).toFixed(2);
+      }
+      function publicImage(path) {
+        return path
+          ? supabase.storage.from("product-images").getPublicUrl(path).data
+              .publicUrl
+          : "";
+      }
+      function siteImageUrl(value) {
+        if (!value) return "";
+        if (/^https?:\/\//i.test(value) || value.startsWith("/")) return value;
+        if (value.startsWith("assets/")) return `/${value}`;
+        return publicImage(value);
+      }
+      function today() {
+        return new Date().toISOString().slice(0, 10);
+      }
+      function dateOnly(v) {
+        return v ? String(v).slice(0, 10) : "";
+      }
+      function dateTime(v) {
+        return v ? new Date(v).toLocaleDateString() : "";
+      }
+      function csvCell(v) {
+        const s = String(v ?? "");
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      }
+      function inquiryStatusLabel(s) {
+        return s === "responded"
+          ? "Responded"
+          : s === "reviewed"
+            ? "Reviewed"
+            : "New";
+      }
+      async function loadInquiries() {
+        const { data, error } = await supabase
+          .from("inquiries")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) return msg(error.message, "error");
+        inquiries = data || [];
+        renderInquiries();
+      }
+      function renderInquiries() {
+        const box = $("#inquiriesList");
+        if (!box) return;
+        box.innerHTML = inquiries.length
+          ? inquiries
+              .map((i) => {
+                const email = escapeHtml(i.email || ""),
+                  phone = escapeHtml(i.phone || ""),
+                  reviewed = i.reviewed_at
+                    ? `Reviewed ${dateTime(i.reviewed_at)}`
+                    : "",
+                  responded = i.responded_at
+                    ? `Responded ${dateTime(i.responded_at)}`
+                    : "";
+                return `<div class="item inquiry-item"><div><div class="meta">${dateTime(i.created_at)} • <span class="badge">${escapeHtml(inquiryStatusLabel(i.status))}</span> • ${escapeHtml(i.request_type || "Availability")}</div><strong>${escapeHtml(i.name || "Website visitor")}</strong>${i.item ? `<div><b>Item:</b> ${escapeHtml(i.item)}</div>` : ""}<div><a href="mailto:${email}">${email}</a>${phone ? ` • <a href="tel:${phone}">${phone}</a>` : ""}</div>${i.message ? `<p>${escapeHtml(i.message)}</p>` : ""}${reviewed || responded ? `<div class="meta">${[reviewed, responded].filter(Boolean).join(" • ")}</div>` : ""}</div><div class="actions">${i.status !== "reviewed" ? `<button data-inquiry-status="reviewed" data-inquiry-id="${i.id}">Reviewed</button>` : ""}${i.status !== "responded" ? `<button data-inquiry-status="responded" data-inquiry-id="${i.id}">Responded</button>` : ""}<button data-inquiry-delete="${i.id}" style="color:#a53b32">Delete</button></div></div>`;
+              })
+              .join("")
+          : '<div class="meta">No inquiries yet.</div>';
+      }
+      $("#refreshInquiries")?.addEventListener("click", loadInquiries);
+      $("#inquiriesList")?.addEventListener("click", async (e) => {
+        const id = e.target.dataset.inquiryId,
+          st = e.target.dataset.inquiryStatus;
+        if (id && st) {
+          const now = new Date().toISOString(),
+            payload = { status: st };
+          if (st === "reviewed") payload.reviewed_at = now;
+          if (st === "responded") {
+            payload.reviewed_at = now;
+            payload.responded_at = now;
+          }
+          const { error } = await supabase
+            .from("inquiries")
+            .update(payload)
+            .eq("id", id);
+          if (error) return msg(error.message, "error");
+          await loadInquiries();
+          return;
+        }
+        const del = e.target.dataset.inquiryDelete;
+        if (del) {
+          if (!confirm("Delete this inquiry?")) return;
+          const { error } = await supabase
+            .from("inquiries")
+            .delete()
+            .eq("id", del);
+          if (error) return msg(error.message, "error");
+          await loadInquiries();
+        }
+      });
+      async function isAdmin() {
+        const { data, error } = await supabase
+          .from("admin_users")
+          .select("user_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        return !error && !!data;
+      }
+      async function refreshAuth() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        user = session?.user || null;
+        if (!user) {
+          $("#authPanel").classList.remove("hidden");
+          $("#claimPanel").classList.add("hidden");
+          $("#adminPanel").classList.add("hidden");
+          return;
+        }
+        $("#authPanel").classList.add("hidden");
+        $("#accountEmail").textContent = `Signed in as ${user.email}`;
+        if (await isAdmin()) {
+          showAdmin();
+        } else {
+          $("#claimPanel").classList.remove("hidden");
+          $("#adminPanel").classList.add("hidden");
+        }
+      }
+      function showAdmin() {
+        $("#claimPanel").classList.add("hidden");
+        $("#adminPanel").classList.remove("hidden");
+        renderImagePreview(null);
+        loadProducts();
+        loadInquiries();
+        loadCopy();
+      }
+      $("#loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const { error } = await supabase.auth.signInWithPassword({
+          email: $("#loginEmail").value.trim(),
+          password: $("#loginPassword").value,
+        });
+        if (error) return msg(error.message, "error");
+        msg("Signed in.", "success");
+        await refreshAuth();
+      });
+      $("#emailChangeForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = $("#newEmail").value.trim();
+        if (!email || email === user?.email)
+          return msg("Enter a different email address.", "error");
+        const { error } = await supabase.auth.updateUser(
+          { email },
+          { emailRedirectTo: ADMIN_REDIRECT_URL },
+        );
+        if (error) return msg(error.message, "error");
+        $("#newEmail").value = "";
+        msg(
+          "Email change requested. Check the confirmation email before signing out.",
+          "success",
+        );
+      });
+      $("#passwordChangeForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const password = $("#newPassword").value,
+          confirm = $("#confirmPassword").value;
+        if (password !== confirm)
+          return msg("Passwords do not match.", "error");
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) return msg(error.message, "error");
+        $("#passwordChangeForm").reset();
+        msg(
+          "Password updated. Use the new password next time you sign in.",
+          "success",
+        );
+      });
+      $("#claimForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const { data, error } = await supabase.rpc("claim_first_admin", {
+          p_code: $("#bootstrapCode").value.trim(),
+        });
+        if (error) return msg(error.message, "error");
+        if (data) {
+          msg("Admin access enabled.", "success");
+          await refreshAuth();
+        }
+      });
+      $("#inviteAdminForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = $("#adminEmail").value.trim();
+        const invite = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: ADMIN_REDIRECT_URL,
+            shouldCreateUser: true,
+          },
+        });
+        if (invite.error) return msg(invite.error.message, "error");
+        const grant = await supabase.rpc("grant_admin_by_email", {
+          p_email: email,
+        });
+        if (grant.error)
+          return msg(
+            `Invite email sent, but admin access was not granted yet: ${grant.error.message}`,
+            "error",
+          );
+        $("#adminEmail").value = "";
+        msg("Admin invite sent and admin access granted.", "success");
+      });
+      $("#adminPasswordForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = $("#passwordAdminEmail").value.trim(),
+          password = $("#temporaryPassword").value,
+          confirm = $("#confirmTemporaryPassword").value;
+        if (password !== confirm)
+          return msg("Temporary passwords do not match.", "error");
+        const { error } = await supabase.rpc("set_user_password_by_email", {
+          p_email: email,
+          p_password: password,
+        });
+        if (error) return msg(error.message, "error");
+        $("#adminPasswordForm").reset();
+        msg(
+          "Temporary password set. Ask the user to sign in and change it from Account.",
+          "success",
+        );
+      });
+      document.querySelectorAll(".signOut").forEach((b) =>
+        b.addEventListener("click", async () => {
+          await supabase.auth.signOut();
+          location.reload();
+        }),
+      );
+      document.querySelectorAll(".admin-tabs button").forEach((b) =>
+        b.addEventListener("click", () => {
+          document
+            .querySelectorAll(".admin-tabs button")
+            .forEach((x) => x.classList.remove("active"));
+          b.classList.add("active");
+          $("#accountTab").classList.toggle(
+            "hidden",
+            b.dataset.adminTab !== "account",
+          );
+          $("#copyTab").classList.toggle(
+            "hidden",
+            b.dataset.adminTab !== "copy",
+          );
+          $("#imagesTab").classList.toggle(
+            "hidden",
+            b.dataset.adminTab !== "images",
+          );
+          $("#inquiriesTab").classList.toggle(
+            "hidden",
+            b.dataset.adminTab !== "inquiries",
+          );
+          $("#listingsTab").classList.toggle(
+            "hidden",
+            b.dataset.adminTab !== "listings",
+          );
+          if (b.dataset.adminTab === "inquiries") loadInquiries();
+        }),
+      );
+      function renderCopyFields(values = {}) {
+        $("#copyFields").innerHTML = copyFields
+          .map(
+            ([key, label]) =>
+              `<div><label>${escapeHtml(label)}</label><textarea data-copy-key="${escapeHtml(key)}">${escapeHtml(values[key] || "")}</textarea></div>`,
+          )
+          .join("");
+      }
+      function renderSiteImageFields(values = {}) {
+        $("#siteImageFields").innerHTML = siteImageFields
+          .map(([key, label, fallback]) => {
+            const pending = selectedSiteImageFiles[key],
+              value = values[key] || fallback,
+              src = pending?.url || siteImageUrl(value);
+            return `<div class="site-image-card"><img src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async"><h3>${escapeHtml(label)}</h3><input data-site-image-file="${escapeHtml(key)}" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><input data-site-image-value="${escapeHtml(key)}" type="hidden" value="${escapeHtml(value)}"><div class="row"><button class="btn secondary" type="button" data-pick-site-image="${escapeHtml(key)}">Choose image</button><button class="btn secondary" type="button" data-reset-site-image="${escapeHtml(key)}">Use default</button></div><div class="filehint">${pending ? "New image selected. Save to publish it." : "Current image shown above."}</div></div>`;
+          })
+          .join("");
+      }
+      async function loadCopy() {
+        renderCopyFields();
+        renderSiteImageFields();
+        const { data, error } = await supabase
+          .from("site_copy")
+          .select("key,value")
+          .order("key");
+        if (error) return msg(error.message, "error");
+        const values = {};
+        (data || []).forEach((row) => (values[row.key] = row.value));
+        renderCopyFields(values);
+        renderSiteImageFields(values);
+      }
+      $("#copyForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const rows = [...document.querySelectorAll("[data-copy-key]")].map(
+          (el) => ({ key: el.dataset.copyKey, value: el.value }),
+        );
+        const recipient = rows
+          .find((row) => row.key === "contact_email")
+          ?.value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient || ""))
+          return msg("Enter a valid inquiry recipient email.", "error");
+        const { error } = await supabase
+          .from("site_copy")
+          .upsert(rows, { onConflict: "key" });
+        if (error) return msg(error.message, "error");
+        msg("Website copy saved.", "success");
+      });
+      async function optimizePhotoFile(file, { optimize = true } = {}) {
+        if (
+          !optimize ||
+          !file ||
+          file.type === "image/gif" ||
+          !file.type.startsWith("image/")
+        )
+          return file;
+        let bitmap;
+        try {
+          bitmap = await createImageBitmap(file);
+        } catch {
+          return file;
+        }
+        const maxEdge = 1800,
+          largest = Math.max(bitmap.width, bitmap.height),
+          scale = Math.min(1, maxEdge / largest),
+          width = Math.round(bitmap.width * scale),
+          height = Math.round(bitmap.height * scale);
+        if (scale === 1 && file.size <= 900000) {
+          bitmap.close?.();
+          return file;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(bitmap, 0, 0, width, height);
+        bitmap.close?.();
+        const blob = await new Promise((resolve) =>
+          canvas.toBlob(resolve, "image/jpeg", 0.82),
+        );
+        if (!blob) return file;
+        const base =
+          (file.name || "photo")
+            .replace(/\.[^.]+$/, "")
+            .replace(/[^a-z0-9_-]+/gi, "-") || "photo";
+        return new File([blob], `${base}.jpg`, {
+          type: "image/jpeg",
+          lastModified: Date.now(),
+        });
+      }
+      async function uploadImage(file, id, options = {}) {
+        if (!file) return null;
+        const uploadFile = await optimizePhotoFile(file, options),
+          ext = (
+            uploadFile.type === "image/jpeg"
+              ? "jpg"
+              : uploadFile.name.split(".").pop() || "jpg"
+          )
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+        const path = `${id}/${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage
+          .from("product-images")
+          .upload(path, uploadFile, { cacheControl: "3600", upsert: false });
+        if (error) throw error;
+        return path;
+      }
+      $("#siteImageFields").addEventListener("click", (e) => {
+        const pick = e.target.dataset.pickSiteImage;
+        if (pick) {
+          document
+            .querySelector(`[data-site-image-file="${CSS.escape(pick)}"]`)
+            ?.click();
+          return;
+        }
+        const reset = e.target.dataset.resetSiteImage;
+        if (reset) {
+          const pending = selectedSiteImageFiles[reset];
+          if (pending) URL.revokeObjectURL(pending.url);
+          delete selectedSiteImageFiles[reset];
+          const field = siteImageFields.find(([key]) => key === reset);
+          document.querySelector(
+            `[data-site-image-value="${CSS.escape(reset)}"]`,
+          ).value = field?.[2] || "";
+          renderSiteImageFields(
+            Object.fromEntries(
+              [...document.querySelectorAll("[data-site-image-value]")].map(
+                (el) => [el.dataset.siteImageValue, el.value],
+              ),
+            ),
+          );
+        }
+      });
+      $("#siteImageFields").addEventListener("change", (e) => {
+        const key = e.target.dataset.siteImageFile,
+          file = e.target.files?.[0];
+        if (!key || !file) return;
+        const pending = selectedSiteImageFiles[key];
+        if (pending) URL.revokeObjectURL(pending.url);
+        selectedSiteImageFiles[key] = { file, url: URL.createObjectURL(file) };
+        renderSiteImageFields(
+          Object.fromEntries(
+            [...document.querySelectorAll("[data-site-image-value]")].map(
+              (el) => [el.dataset.siteImageValue, el.value],
+            ),
+          ),
+        );
+      });
+      $("#siteImagesForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const uploaded = [];
+        try {
+          const rows = [];
+          for (const [key] of siteImageFields) {
+            let value =
+              document.querySelector(
+                `[data-site-image-value="${CSS.escape(key)}"]`,
+              )?.value || "";
+            if (selectedSiteImageFiles[key]) {
+              value = await uploadImage(
+                selectedSiteImageFiles[key].file,
+                "site",
+                { optimize: key !== "site_logo" },
+              );
+              uploaded.push(value);
+            }
+            rows.push({ key, value });
+          }
+          const { error } = await supabase
+            .from("site_copy")
+            .upsert(rows, { onConflict: "key" });
+          if (error) throw error;
+          Object.values(selectedSiteImageFiles).forEach((item) =>
+            URL.revokeObjectURL(item.url),
+          );
+          selectedSiteImageFiles = {};
+          msg("Website images saved.", "success");
+          await loadCopy();
+        } catch (err) {
+          if (uploaded.length)
+            await supabase.storage.from("product-images").remove(uploaded);
+          msg(err.message || String(err), "error");
+        }
+      });
+      function imagesFor(p) {
+        const rows = [...(p.product_images || [])].sort(
+          (a, b) => (a.sort_order || 0) - (b.sort_order || 0),
+        );
+        const paths = rows.map((row) => row.image_path).filter(Boolean);
+        if (!paths.length && p.image_path) paths.push(p.image_path);
+        return [...new Set(paths)];
+      }
+      function clearSelectedPhotos() {
+        selectedPhotoFiles.forEach((item) => URL.revokeObjectURL(item.url));
+        selectedPhotoFiles = [];
+      }
+      function currentProduct() {
+        return products.find((x) => x.id === $("#editId").value) || null;
+      }
+      function renderImagePreview(p = currentProduct()) {
+        const paths = imagesFor(p || {}).filter(
+          (path) => !removedImagePaths.includes(path),
+        );
+        const existing = paths
+          .map(
+            (path, i) =>
+              `<div class="existing-photo"><img src="${escapeHtml(publicImage(path))}" alt="" loading="lazy" decoding="async"><button type="button" title="Remove photo" data-remove-image="${escapeHtml(path)}">x</button>${i === 0 ? '<span class="photo-badge">Primary</span>' : ""}</div>`,
+          )
+          .join("");
+        const selected = selectedPhotoFiles
+          .map(
+            (item, i) =>
+              `<div class="existing-photo"><img src="${escapeHtml(item.url)}" alt="" loading="lazy" decoding="async"><button type="button" title="Remove selected photo" data-remove-selected="${escapeHtml(item.id)}">x</button><span class="selected-badge">New ${i + 1}</span></div>`,
+          )
+          .join("");
+        $("#imagePreview").innerHTML =
+          existing +
+          selected +
+          `<button class="add-photo" type="button" data-add-photo>+<span>Add photo</span></button>`;
+      }
+      async function loadProducts() {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) return msg(error.message, "error");
+        products = data || [];
+        const ids = products.map((p) => p.id);
+        if (ids.length) {
+          const { data: images, error: imageError } = await supabase
+            .from("product_images")
+            .select("*")
+            .in("product_id", ids)
+            .order("sort_order", { ascending: true });
+          if (imageError) return msg(imageError.message, "error");
+          const byProduct = {};
+          (images || []).forEach((img) => {
+            (byProduct[img.product_id] ||= []).push(img);
+          });
+          products = products.map((p) => ({
+            ...p,
+            product_images: byProduct[p.id] || [],
+          }));
+        }
+        renderList();
+      }
+      function renderList() {
+        const category = $("#categoryFilter")?.value || "all";
+        const list = products.filter(
+          (p) =>
+            p.status === currentStatus &&
+            (category === "all" || (p.category || "Other") === category),
+        );
+        $("#list").innerHTML = list.length
+          ? list
+              .map((p) => {
+                const paths = imagesFor(p),
+                  img = paths[0] ? publicImage(paths[0]) : "",
+                  statusMeta =
+                    p.status === "available"
+                      ? ""
+                      : ` • ${dateOnly(p.status_effective_date) || "No status date"} • updated ${dateTime(p.status_changed_at) || "unknown"}${p.status_updated_by_email ? ` by ${escapeHtml(p.status_updated_by_email)}` : ""}`,
+                  photoMeta = paths.length
+                    ? ` • ${paths.length} photo${paths.length === 1 ? "" : "s"}`
+                    : "";
+                return `<div class="item"><div class="thumb">${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy" decoding="async">` : "📦"}</div><div><strong>${escapeHtml(p.title)}</strong><div class="meta">${money(p.price)} • ${escapeHtml(p.category || "Other")} • ${escapeHtml(p.condition)}${photoMeta}${statusMeta}</div></div><div class="actions"><button data-edit="${p.id}">Edit</button>${p.status !== "available" ? `<button data-statuschange="available" data-id="${p.id}">Restore</button>` : `<button data-statuschange="sold" data-id="${p.id}">Sold</button><button data-statuschange="hidden" data-id="${p.id}">Hide</button>`}${p.status !== "trash" ? `<button data-statuschange="trash" data-id="${p.id}">Trash</button>` : `<button data-delete="${p.id}" style="color:#a53b32">Delete forever</button>`}</div></div>`;
+              })
+              .join("")
+          : '<div class="meta">Nothing here.</div>';
+      }
+      document.querySelectorAll(".tabs button").forEach((b) =>
+        b.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tabs button")
+            .forEach((x) => x.classList.remove("active"));
+          b.classList.add("active");
+          currentStatus = b.dataset.status;
+          renderList();
+        }),
+      );
+      $("#categoryFilter").addEventListener("change", renderList);
+      function openListingEditor() {
+        $("#listingEditor").classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      }
+      function closeListingEditor() {
+        $("#listingEditor").classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+      function discardListingForm() {
+        resetForm();
+        closeListingEditor();
+      }
+      $("#newListing").addEventListener("click", () => {
+        resetForm();
+        openListingEditor();
+      });
+      $("#listingEditor").addEventListener("click", (e) => {
+        if (e.target.id === "listingEditor") discardListingForm();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Escape" &&
+          !$("#listingEditor").classList.contains("hidden")
+        )
+          discardListingForm();
+      });
+      $("#exportCsv").addEventListener("click", () => {
+        const headers = [
+          "id",
+          "title",
+          "price",
+          "category",
+          "condition",
+          "status",
+          "status_effective_date",
+          "status_changed_at",
+          "status_updated_by_email",
+          "created_at",
+          "updated_at",
+          "description",
+          "image_path",
+          "image_paths",
+        ];
+        const lines = [headers.join(",")].concat(
+          products.map((p) =>
+            headers
+              .map((h) =>
+                csvCell(h === "image_paths" ? imagesFor(p).join("|") : p[h]),
+              )
+              .join(","),
+          ),
+        );
+        const blob = new Blob([lines.join("\n")], {
+          type: "text/csv;charset=utf-8",
+        });
+        const url = URL.createObjectURL(blob),
+          a = document.createElement("a");
+        a.href = url;
+        a.download = `hands-on-moving-thrift-inventory-${today()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+      $("#list").addEventListener("click", async (e) => {
+        const edit = e.target.dataset.edit;
+        if (edit) {
+          const p = products.find((x) => x.id === edit);
+          removedImagePaths = [];
+          clearSelectedPhotos();
+          $("#editId").value = p.id;
+          $("#oldImagePath").value = p.image_path || "";
+          $("#title").value = p.title;
+          $("#price").value = p.price;
+          $("#category").value = p.category || "Other";
+          $("#condition").value = p.condition;
+          $("#status").value = p.status;
+          $("#statusDate").value = dateOnly(p.status_effective_date);
+          $("#description").value = p.description || "";
+          $("#image").value = "";
+          renderImagePreview(p);
+          $("#formTitle").textContent = "Edit listing";
+          openListingEditor();
+          return;
+        }
+        const id = e.target.dataset.id,
+          st = e.target.dataset.statuschange;
+        if (id && st) {
+          const payload = {
+            status: st,
+            status_effective_date: st === "available" ? null : today(),
+            status_changed_at: new Date().toISOString(),
+            status_updated_by: user.id,
+            status_updated_by_email: user.email,
+          };
+          const { error } = await supabase
+            .from("products")
+            .update(payload)
+            .eq("id", id);
+          if (error) return msg(error.message, "error");
+          await loadProducts();
+          return;
+        }
+        const del = e.target.dataset.delete;
+        if (del) {
+          const p = products.find((x) => x.id === del);
+          if (!confirm(`Permanently delete ${p.title}?`)) return;
+          const paths = imagesFor(p);
+          if (paths.length)
+            await supabase.storage.from("product-images").remove(paths);
+          const { error } = await supabase
+            .from("products")
+            .delete()
+            .eq("id", del);
+          if (error) return msg(error.message, "error");
+          await loadProducts();
+        }
+      });
+      $("#imagePreview").addEventListener("click", (e) => {
+        const add = e.target.closest("[data-add-photo]");
+        if (add) {
+          $("#image").click();
+          return;
+        }
+        const selectedId = e.target.dataset.removeSelected;
+        if (selectedId) {
+          const item = selectedPhotoFiles.find((x) => x.id === selectedId);
+          if (item) URL.revokeObjectURL(item.url);
+          selectedPhotoFiles = selectedPhotoFiles.filter(
+            (x) => x.id !== selectedId,
+          );
+          renderImagePreview();
+          return;
+        }
+        const path = e.target.dataset.removeImage;
+        if (!path) return;
+        removedImagePaths = [...new Set([...removedImagePaths, path])];
+        renderImagePreview();
+      });
+      $("#image").addEventListener("change", (e) => {
+        const files = [...e.target.files];
+        files.forEach((file) =>
+          selectedPhotoFiles.push({
+            id: crypto.randomUUID(),
+            file,
+            url: URL.createObjectURL(file),
+          }),
+        );
+        e.target.value = "";
+        renderImagePreview();
+      });
+      function resetForm() {
+        $("#productForm").reset();
+        $("#editId").value = "";
+        $("#oldImagePath").value = "";
+        $("#status").value = "available";
+        $("#statusDate").value = "";
+        $("#category").value = "Other";
+        removedImagePaths = [];
+        clearSelectedPhotos();
+        renderImagePreview(null);
+        $("#formTitle").textContent = "Add listing";
+      }
+      $("#cancelEdit").addEventListener("click", discardListingForm);
+      $("#productForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = $("#editId").value || crypto.randomUUID(),
+          existing = products.find((p) => p.id === id),
+          status = $("#status").value,
+          uploaded = [];
+        try {
+          for (const item of selectedPhotoFiles)
+            uploaded.push(await uploadImage(item.file, id));
+          const kept = imagesFor(existing || {}).filter(
+            (path) => !removedImagePaths.includes(path),
+          );
+          const paths = [...new Set([...kept, ...uploaded])];
+          const { error } = await supabase.rpc("save_product_with_images", {
+            p_id: id,
+            p_title: $("#title").value.trim(),
+            p_price: Number($("#price").value),
+            p_category: $("#category").value,
+            p_condition: $("#condition").value,
+            p_status: status,
+            p_description: $("#description").value.trim(),
+            p_status_effective_date:
+              status === "available" ? null : $("#statusDate").value || today(),
+            p_image_paths: paths,
+          });
+          if (error) throw error;
+          if (removedImagePaths.length)
+            await supabase.storage
+              .from("product-images")
+              .remove(removedImagePaths);
+          resetForm();
+          closeListingEditor();
+          msg("Listing saved. Photos stored with this listing.", "success");
+          await loadProducts();
+        } catch (err) {
+          if (uploaded.length)
+            await supabase.storage.from("product-images").remove(uploaded);
+          msg(err.message || String(err), "error");
+        }
+      });
+      supabase.auth.onAuthStateChange(() => refreshAuth());
+      refreshAuth();
+    </script>
+  </body>
+</html>

@@ -9,6 +9,9 @@ Static Netlify storefront backed by Supabase.
 - Supabase Postgres for product listings
 - Supabase Storage bucket `product-images`
 - Row Level Security: public read of available products, admin-only writes
+- One unified product category used by both admin and storefront filtering
+- Transactional product/photo-reference saves through `save_product_with_images`
+- Inquiry delivery address controlled by `contact_email` in Admin > TEXT
 
 ## First admin setup
 1. Open `/admin/`.
